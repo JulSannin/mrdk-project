@@ -9,7 +9,7 @@ import VideoBlock from '../../widgets/videoBlock/VideoBlock';
 import ReactPaginate from '../../shared/lib/reactPaginate';
 import styles from './EventsPage.module.css';
 
-const LIMIT = 12;
+const LIMIT = 24;
 
 interface EventYear {
   year: number;
@@ -96,9 +96,10 @@ export function EventsPage() {
             ? Array.from({ length: LIMIT }, (_, i) => (
                 <li key={i} className={styles['card-skeleton']} />
               ))
-            : events.map((event) => (
+            : events.map((event, i) => (
                 <li key={event.id}>
-                  <EventCard event={event} />
+                  {/* первый ряд грузим приоритетно — ускоряет LCP при заходе на страницу */}
+                  <EventCard event={event} priority={i < 4} />
                 </li>
               ))}
         </ul>

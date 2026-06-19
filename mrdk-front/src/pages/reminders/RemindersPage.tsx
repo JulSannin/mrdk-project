@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import ReactPaginate from '../../shared/lib/reactPaginate';
 import { useQuery } from '@tanstack/react-query';
 import type { ApiList, Reminder } from '../../entities/types';
@@ -14,7 +15,9 @@ import styles from './RemindersPage.module.css';
 const LIMIT = 12;
 
 export function RemindersPage() {
-  const [page, setPage] = useState(1);
+  // номер страницы живёт в URL (?page=2) — ссылка шарится, работают «назад/вперёд»
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10) || 1);
   const [selected, setSelected] = useState<Reminder | null>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const prevFocusRef = useRef<HTMLElement | null>(null);
@@ -70,8 +73,15 @@ export function RemindersPage() {
         {pageCount > 1 && (
           <ReactPaginate
             pageCount={pageCount}
-            forcePage={page - 1}
-            onPageChange={(e) => setPage(e.selected + 1)}
+            forcePage={Math.min(page, pageCount) - 1}
+            onPageChange={(e) => {
+              setSearchParams((prev) => {
+                const p = new URLSearchParams(prev);
+                p.set('page', String(e.selected + 1));
+                return p;
+              });
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             previousLabel="←"
             nextLabel="→"
           />

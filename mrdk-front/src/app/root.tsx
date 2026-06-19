@@ -51,8 +51,10 @@ export default function RootLayout() {
     );
   }
 
+  // AuthProvider оборачивает только админку/логин (ветка hideChrome выше) — на
+  // публичных страницах он не нужен и лишь зря дёргал /auth/me на каждой загрузке.
   return (
-    <AuthProvider>
+    <>
       <div className="topbar" ref={topbarRef}>
         <BviPanel />
         <Header />
@@ -62,6 +64,6 @@ export default function RootLayout() {
       </main>
       <Footer />
       <ConsentBanner />
-    </AuthProvider>
+    </>
   );
 }

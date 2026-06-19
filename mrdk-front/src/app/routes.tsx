@@ -14,6 +14,7 @@ import { RemindersPage } from '../pages/reminders/RemindersPage';
 import { AntiCorruptionPage } from '../pages/anticorruption/AntiCorruptionPage';
 import { ContactsPage } from '../pages/contacts/ContactsPage';
 import { NotFoundPage } from '../pages/not-found/NotFoundPage';
+import { RouteError } from '../shared/ui/RouteError';
 
 // Админка (react-admin + MUI) и логин грузятся отдельными чанками,
 // чтобы посетители публичного сайта их не скачивали.
@@ -26,8 +27,9 @@ const LoginPage = lazy(() =>
 
 export const router = createBrowserRouter([
   {
-
     element: <RootLayout />,
+    // ловит необработанные ошибки рендера любой страницы — вместо белого экрана
+    errorElement: <RouteError />,
     children: [
       { path: '/', element: <HomePage /> },
       { path: '/events', element: <EventsPage /> },

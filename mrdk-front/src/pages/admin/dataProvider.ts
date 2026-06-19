@@ -50,10 +50,39 @@ function toFormData(data: Record<string, unknown>): FormData {
 }
 
 // У workplan/documents нет JSON-эндпоинта одной записи (GET /:id отдаёт файл на
-// скачивание), поэтому getOne для них ищет запись в общем списке (первые 100).
+// скачивание), поэтому getOne для них ищет запись в общем списке — постранично,
+// пока не найдём или не дойдём до конца (раньше брали только первые 100 и при
+// большем числе записей getOne для «дальних» ломался).
 async function findInList(ep: string, id: unknown): Promise<ApiRecord | null> {
-  const res = await apiClient.get(`/${ep}`, { params: { page: 1, limit: 100 } });
-  return (res.data.data as ApiRecord[]).find((r) => String(r.id) === String(id)) ?? null;
+  const limit = 100;
+  for (let page = 1; ; page++) {
+    const res = await apiClient.get(`/${ep}`, { params: { page, limit } });
+    const rows = res.data.data as ApiRecord[];
+    const found = rows.find((r) => String(r.id) === String(id));
+    if (found) return found;
+    if (rows.length < limit) return null; // дошли до конца списка
+  }
+}
+
+// Картинки/видео события грузятся отдельными multipart-запросами на свои эндпоинты
+// (/:id/images, /:id/videos). Возвращает true, если что-то отправляли.
+async function postEventMedia(
+  ep: string,
+  id: unknown,
+  field: 'images' | 'videos',
+  files: unknown,
+): Promise<void> {
+  const list = files as Array<{ rawFile?: File }> | undefined;
+  if (!list || list.length === 0) return;
+  const fd = new FormData();
+  let has = false;
+  for (const f of list) {
+    if (f.rawFile instanceof File) {
+      fd.append(field, f.rawFile);
+      has = true;
+    }
+  }
+  if (has) await apiClient.post(`/${ep}/${id}/${field}`, fd);
 }
 
 export const dataProvider = {
@@ -105,21 +134,13 @@ export const dataProvider = {
       const { additionalImages, additionalVideos, ...rest } = params.data as Record<string, unknown>;
       const res = await apiClient.post(`/${ep}`, toFormData(rest));
       const created = res.data.data as ApiRecord;
-      const newImages = additionalImages as Array<{ rawFile?: File }> | undefined;
-      if (newImages && newImages.length > 0) {
-        const fd = new FormData();
-        for (const img of newImages) {
-          if (img.rawFile instanceof File) fd.append('images', img.rawFile);
-        }
-        await apiClient.post(`/${ep}/${created.id}/images`, fd);
-      }
-      const newVideos = additionalVideos as Array<{ rawFile?: File }> | undefined;
-      if (newVideos && newVideos.length > 0) {
-        const fd = new FormData();
-        for (const v of newVideos) {
-          if (v.rawFile instanceof File) fd.append('videos', v.rawFile);
-        }
-        await apiClient.post(`/${ep}/${created.id}/videos`, fd);
+      // медиа грузим отдельными запросами после создания; если упадут — событие уже
+      // создано, поэтому сообщаем об этом явно, чтобы админ не думал, что ничего не вышло
+      try {
+        await postEventMedia(ep, created.id, 'images', additionalImages);
+        await postEventMedia(ep, created.id, 'videos', additionalVideos);
+      } catch {
+        throw new Error('Событие создано, но часть медиафайлов не загрузилась — добавьте их повторно через редактирование.');
       }
       return { data: normalize(resource, created) };
     }
@@ -135,23 +156,14 @@ export const dataProvider = {
     }
     if (resource === 'events') {
       const { additionalImages, additionalVideos, ...rest } = params.data as Record<string, unknown>;
-      const newImages = additionalImages as Array<{ rawFile?: File }> | undefined;
-      if (newImages && newImages.length > 0) {
-        const fd = new FormData();
-        for (const img of newImages) {
-          if (img.rawFile instanceof File) fd.append('images', img.rawFile);
-        }
-        await apiClient.post(`/${ep}/${params.id}/images`, fd);
-      }
-      const newVideos = additionalVideos as Array<{ rawFile?: File }> | undefined;
-      if (newVideos && newVideos.length > 0) {
-        const fd = new FormData();
-        for (const v of newVideos) {
-          if (v.rawFile instanceof File) fd.append('videos', v.rawFile);
-        }
-        await apiClient.post(`/${ep}/${params.id}/videos`, fd);
-      }
+      // сначала сохраняем поля события, затем догружаем новые медиа (как и при create)
       const res = await apiClient.patch(`/${ep}/${params.id}`, toFormData(rest));
+      try {
+        await postEventMedia(ep, params.id, 'images', additionalImages);
+        await postEventMedia(ep, params.id, 'videos', additionalVideos);
+      } catch {
+        throw new Error('Изменения сохранены, но часть медиафайлов не загрузилась — повторите загрузку.');
+      }
       return { data: normalize(resource, res.data.data as ApiRecord) };
     }
     const res = await apiClient.patch(`/${ep}/${params.id}`, toFormData(params.data));

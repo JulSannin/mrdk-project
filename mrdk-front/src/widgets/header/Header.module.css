@@ -46,7 +46,7 @@
 .header__navlink {
     display: flex;
     align-items: center;
-    height: 24px;
+    height: 54px;
     font-size: 16px;
     text-decoration: none;
     color: var(--color-black-g);
@@ -57,17 +57,16 @@
 .header__navlink_internal:focus,
 .header__navlink_internal.header__navlink_active {
     color: var(--color-black);
-    box-shadow: 0 2px 0 0 var(--color-orange);
+    box-shadow: 0 4px 0 0 var(--color-orange);
 }
 
 .header__navlink_external {
-    box-shadow: 0 2px 0 0 var(--color-blue);
+    box-shadow: 0 4px 0 0 var(--color-blue);
 }
 
 .header__navlink_external:hover,
 .header__navlink_external:focus {
     color: var(--color-blue);
-    box-shadow: 0 2px 0 0 var(--color-blue);
 }
 
 

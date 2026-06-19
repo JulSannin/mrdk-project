@@ -1,14 +1,10 @@
-import { QueryClient, QueryCache } from '@tanstack/react-query';
-import axios from 'axios';
+import { QueryClient } from '@tanstack/react-query';
 
+// QueryClient публичного сайта (у админки react-admin свой внутренний клиент).
+// Глобального редиректа на /login по 401 здесь намеренно нет: публичные запросы
+// не должны отдавать 401, авторизацию в админке разруливает authProvider, а
+// AuthContext сам трактует 401 как «не залогинен» (см. fetchMe).
 export const queryClient = new QueryClient({
-  queryCache: new QueryCache({
-    onError: (error) => {
-      if (axios.isAxiosError(error) && error.response?.status === 401) {
-        window.location.href = '/login';
-      }
-    },
-  }),
   defaultOptions: {
     queries: {
       retry: 1,

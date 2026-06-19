@@ -7,13 +7,15 @@ import styles from './EventCard.module.css';
 
 const MAX_DESCRIPTION_LENGTH = 116;
 
-function EventCard({ event }: { event: Event }) {
+// priority — для карточек «над сгибом» (первый ряд на главной / первой странице):
+// изображение грузим сразу и с высоким приоритетом, остальные — лениво. Это убирает
+// задержку LCP (первая карточка — обычно самый крупный элемент первого экрана).
+function EventCard({ event, priority = false }: { event: Event; priority?: boolean }) {
   return (
     <Link
       to={`/events/${event.id}`}
       className={styles['event-card-link']}
       viewTransition
-      aria-label={event.title}
     >
       <article id={`event-${event.id}`} className={styles['event-card']}>
         <div className={styles['event-card__image-wrap']}>
@@ -22,7 +24,8 @@ function EventCard({ event }: { event: Event }) {
               className={styles['event-card__image']}
               src={`/${event.image_path}`}
               alt={event.title}
-              loading="lazy"
+              loading={priority ? 'eager' : 'lazy'}
+              fetchPriority={priority ? 'high' : undefined}
             />
           )}
         </div>

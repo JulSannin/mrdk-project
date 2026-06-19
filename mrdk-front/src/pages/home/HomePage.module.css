@@ -33,7 +33,7 @@
 .grid {
   display: grid;
   list-style: none;
-  grid-template-columns: repeat(auto-fill, 400px);
+  grid-template-columns: minmax(0, 300px); /* мобилка <620: 1 колонка, карточка ≤300px */
   justify-content: center;
   gap: 20px;
   width: 100%;
@@ -62,15 +62,10 @@
   }
 }
 
-@media (max-width: 1280px) {
-  .grid {
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 300px));
-  }
-
-  .cardSkeleton {
-    height: 400px;
-  }
-}
+@media (min-width: 620px)  { .grid { grid-template-columns: repeat(2, minmax(0, 300px)); } }
+@media (min-width: 940px)  { .grid { grid-template-columns: repeat(3, minmax(0, 300px)); } }
+@media (min-width: 1280px) { .grid { grid-template-columns: repeat(3, minmax(0, 300px)); } }
+@media (min-width: 1660px) { .grid { grid-template-columns: repeat(4, minmax(0, 400px)); } }
 
 @media (max-width: 600px) {
   .heading {

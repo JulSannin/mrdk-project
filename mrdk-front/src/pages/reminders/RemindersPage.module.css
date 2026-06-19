@@ -15,13 +15,11 @@
 .grid {
   display: grid;
   list-style: none;
-  grid-template-columns: repeat(2, minmax(300px, 400px));
+  grid-template-columns: repeat(3, minmax(300px, 400px));
   gap: 20px;
   width: 100%;
 }
 
-/* li-обёртка — грид-контейнер: карточка тянется на всю ячейку (важно для <button>,
-   у которого ширина по умолчанию fit-content). */
 .grid > li {
   display: grid;
 }

@@ -62,7 +62,7 @@
 .events-grid {
   display: grid;
   list-style: none;
-  grid-template-columns: repeat(auto-fill, 400px);
+  grid-template-columns: minmax(0, 300px); /* мобилка <620: 1 колонка, карточка ≤300px */
   justify-content: center;
   gap: 20px;
   width: 100%;
@@ -108,15 +108,13 @@
   }
 }
 
-@media (max-width: 1280px) {
-  .events-grid {
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 300px));
-  }
-
-  .card-skeleton {
-    height: 400px;
-  }
-}
+/* Колонки растут монотонно с шириной (без «скачков» назад), всё по центру.
+   До 1280px карточка ≤300px (1 → 2 → 3 кол); с 1280px карточка ≤400px (3 → 4 → 5 кол).
+   LIMIT=24 (см. EventsPage.tsx) делится на 2/3/4/6 — полные страницы ложатся ровно. */
+@media (min-width: 620px)  { .events-grid { grid-template-columns: repeat(2, minmax(0, 300px)); } }
+@media (min-width: 940px)  { .events-grid { grid-template-columns: repeat(3, minmax(0, 300px)); } }
+@media (min-width: 1280px) { .events-grid { grid-template-columns: repeat(4, minmax(0, 300px)); } }
+@media (min-width: 1660px) { .events-grid { grid-template-columns: repeat(4, minmax(0, 400px)); } }
 
 @media (prefers-reduced-motion: reduce) {
   .fade-in {

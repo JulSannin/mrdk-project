@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import type { ApiList, Event } from '../../entities/types';
@@ -9,28 +9,40 @@ import ExternalLinkCards from '../../widgets/listExternalLinksCards/ExternalLink
 import VideoBlock from '../../widgets/videoBlock/VideoBlock';
 import styles from './HomePage.module.css';
 
-// Сколько событий показывать на главной: мобилка — 4, планшет — 9, десктоп — 12.
-// Брейкпоинты совпадают с остальной вёрсткой (768 / 1280).
-function pickHomeEventsCount(): number {
-  const w = window.innerWidth;
-  if (w < 768) return 4;
-  if (w < 1280) return 9;
-  return 12;
+const MAX_CARDS = 20;
+
+function cardsForColumns(cols: number): number {
+  if (cols <= 1) return 4;
+  if (cols === 2) return window.innerWidth <= 767 ? 4 : 8;
+  if (cols === 3) return window.innerWidth < 1280 ? 9 : 12;
+  return cols * 4;
 }
 
 export function HomePage() {
-  const [count, setCount] = useState(pickHomeEventsCount);
-  useEffect(() => {
-    const onResize = () => setCount(pickHomeEventsCount());
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
 
   const { data, isPending, isError, refetch } = useQuery({
-    queryKey: ['events', 'home', count],
+    queryKey: ['events', 'home'],
     queryFn: () =>
-      apiClient.get<ApiList<Event>>('/events', { params: { limit: count } }).then((r) => r.data),
+      apiClient.get<ApiList<Event>>('/events', { params: { limit: MAX_CARDS } }).then((r) => r.data),
   });
+
+  const [visible, setVisible] = useState(4);
+  const roRef = useRef<ResizeObserver | null>(null);
+
+  const measureGrid = useCallback((el: HTMLUListElement | null) => {
+    roRef.current?.disconnect();
+    if (!el) return;
+    const update = () => {
+      const cols = getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length || 1;
+      setVisible(cardsForColumns(cols));
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    roRef.current = ro;
+  }, []);
+
+  useEffect(() => () => roRef.current?.disconnect(), []);
 
   return (
     <>
@@ -43,14 +55,15 @@ export function HomePage() {
         {isError ? (
           <ErrorMessage onRetry={() => refetch()} />
         ) : (
-          <ul className={styles.grid}>
+          <ul ref={measureGrid} className={styles.grid}>
             {isPending
-              ? Array.from({ length: count }, (_, i) => (
+              ? Array.from({ length: visible }, (_, i) => (
                   <li key={i} className={styles.cardSkeleton} />
                 ))
-              : data.data.map((event) => (
+              : data.data.slice(0, visible).map((event, i) => (
                   <li key={event.id}>
-                    <EventCard event={event} />
+                    {/* первый ряд (до 4 колонок) грузим приоритетно — это ускоряет LCP */}
+                    <EventCard event={event} priority={i < 4} />
                   </li>
                 ))}
           </ul>

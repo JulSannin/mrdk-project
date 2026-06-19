@@ -10,6 +10,26 @@
   text-align: center;
 }
 
+/* Полноэкранный фолбэк роутера, когда страница падает с необработанной ошибкой */
+.route-error {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 16px;
+  text-align: center;
+}
+
+.route-error__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+}
+
 @keyframes shimmer {
   0% {
     background-position: 100% 0;
