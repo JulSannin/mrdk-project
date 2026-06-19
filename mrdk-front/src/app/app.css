@@ -1,0 +1,249 @@
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/inter-v20-cyrillic_latin-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/inter-v20-cyrillic_latin-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/inter-v20-cyrillic_latin-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/inter-v20-cyrillic_latin-700.woff2') format('woff2');
+}
+
+:root {
+  --color-yellow: #fdca40;
+  --color-orange: #ff8c00;
+  --color-black: #000000;
+  --color-black-g: #31393c;
+  --color-gray: #C0C0C0;
+  --color-white: #ffffff;
+  --color-blue: #2176ff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+html,
+body,
+#root {
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.site-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100vw;
+  min-height: 100vh;
+  max-height: 1000vh;
+}
+
+/* Липкая верхняя полоса: панель BVI (если включена) + шапка едут вместе и
+   остаются видимы при прокрутке. */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+/* Доступный, но визуально скрытый текст — для подписей полей форм,
+   которые в дизайне заменены на placeholder (placeholder ≠ label). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+
+/* ── Версия для слабовидящих ───────────────────────────────────
+   Управляется data-атрибутами на <html> (см. BviContext):
+   data-bvi / -scheme / -font / -spacing / -images.
+   Режим намеренно перекрывает дизайн сайта — отсюда * и !important. */
+
+/* Цветовые схемы */
+html[data-bvi='on'][data-bvi-scheme='white'] { --bvi-bg: #fff;    --bvi-fg: #000;    --bvi-link: #0000cc; }
+html[data-bvi='on'][data-bvi-scheme='black'] { --bvi-bg: #000;    --bvi-fg: #fff;    --bvi-link: #ffff00; }
+html[data-bvi='on'][data-bvi-scheme='blue']  { --bvi-bg: #9dd1ff; --bvi-fg: #063462; --bvi-link: #06408a; }
+html[data-bvi='on'][data-bvi-scheme='beige'] { --bvi-bg: #f7f3d6; --bvi-fg: #4d4b43; --bvi-link: #7a3b00; }
+html[data-bvi='on'][data-bvi-scheme='green'] { --bvi-bg: #3b2716; --bvi-fg: #a9e44d; --bvi-link: #cfe98f; }
+
+/* Базовый кегль */
+html[data-bvi='on'][data-bvi-font='normal'] { --bvi-font: 18px; }
+html[data-bvi='on'][data-bvi-font='large']  { --bvi-font: 22px; }
+html[data-bvi='on'][data-bvi-font='xlarge'] { --bvi-font: 28px; }
+
+/* Интервалы — междустрочный и межбуквенный независимо */
+html[data-bvi='on'][data-bvi-line-height='normal'] { --bvi-lh: 1.5; }
+html[data-bvi='on'][data-bvi-line-height='medium'] { --bvi-lh: 1.8; }
+html[data-bvi='on'][data-bvi-line-height='large']  { --bvi-lh: 2.2; }
+html[data-bvi='on'][data-bvi-letter-spacing='normal'] { --bvi-ls: 0; }
+html[data-bvi='on'][data-bvi-letter-spacing='medium'] { --bvi-ls: 0.1em; }
+html[data-bvi='on'][data-bvi-letter-spacing='large']  { --bvi-ls: 0.2em; }
+
+html[data-bvi='on'] { background: var(--bvi-bg); }
+html[data-bvi='on'] body { background: var(--bvi-bg) !important; color: var(--bvi-fg) !important; }
+
+/* Шапка и панель BVI — непрозрачный фон схемы (перебиваем общий transparent),
+   чтобы сквозь них не просвечивал контент. Панель закреплена сверху при прокрутке,
+   а шапку в BVI делаем static, чтобы она не накладывалась на закреплённую панель. */
+html[data-bvi='on'] .topbar { background-color: var(--bvi-bg) !important; }
+html[data-bvi='on'] header {
+  background-color: var(--bvi-bg) !important;
+  border-bottom: 2px solid var(--bvi-fg);
+}
+html[data-bvi='on'] .bvi-panel {
+  /* Фиксированная палитра панели управления — переопределяем переменные локально,
+     чтобы её цвета (фон/текст/рамки/активные кнопки) НЕ зависели от выбранной
+     схемы сайта. Образцы цветов (.bvi-swatch-*) заданы жёстко и не затрагиваются. */
+  --bvi-bg: #fff;
+  --bvi-fg: #1f1f1f;
+  --bvi-link: #2176ff;
+  background-color: var(--bvi-bg) !important;
+  position: relative;
+  z-index: 30; /* выше слоя/панели бургер-меню (10/20), чтобы оставаться сверху */
+}
+
+/* Бургер-меню в BVI — непрозрачный фон схемы (иначе общий transparent делает его
+   сквозным, и контент просвечивает сквозь меню). */
+html[data-bvi='on'] .bvi-burger-panel { background-color: var(--bvi-bg) !important; }
+
+/* Завершающий разделитель в конце бургер-меню — показываем только в BVI. */
+.bvi-burger-end { display: none; }
+html[data-bvi='on'] .bvi-burger-end {
+  display: block;
+  border: none;
+  border-top: 2px solid var(--bvi-fg);
+  margin: 8px 0 0;
+}
+
+/* Панель управления BVI — фиксированного компактного вида: не реагирует на
+   выбранные размер шрифта / интервалы (меняется только контент сайта, не панель). */
+html[data-bvi='on'] .bvi-panel,
+html[data-bvi='on'] .bvi-panel * {
+  font-size: 16px !important;
+  line-height: 1.3 !important;
+  letter-spacing: normal !important;
+}
+
+/* Кнопки-образцы цветовых схем в панели — показывают свои цвета (перебиваем
+   общий transparent/fg). */
+html[data-bvi='on'] .bvi-swatch-white { background: #fff !important;    color: #000 !important; }
+html[data-bvi='on'] .bvi-swatch-black { background: #000 !important;    color: #fff !important; }
+html[data-bvi='on'] .bvi-swatch-blue  { background: #9dd1ff !important; color: #063462 !important; }
+html[data-bvi='on'] .bvi-swatch-beige { background: #f7f3d6 !important; color: #4d4b43 !important; }
+html[data-bvi='on'] .bvi-swatch-green { background: #3b2716 !important; color: #a9e44d !important; }
+
+html[data-bvi='on'] * {
+  background-color: transparent !important;
+  background-image: none !important;
+  color: var(--bvi-fg) !important;
+  border-color: var(--bvi-fg) !important;
+  letter-spacing: var(--bvi-ls) !important;
+  line-height: var(--bvi-lh) !important;
+}
+
+/* Текст крупнее; заголовки сохраняют иерархию относительно базового кегля */
+html[data-bvi='on'] p, html[data-bvi='on'] span, html[data-bvi='on'] a,
+html[data-bvi='on'] li, html[data-bvi='on'] td, html[data-bvi='on'] th,
+html[data-bvi='on'] dd, html[data-bvi='on'] dt, html[data-bvi='on'] label,
+html[data-bvi='on'] time, html[data-bvi='on'] button, html[data-bvi='on'] input,
+html[data-bvi='on'] textarea, html[data-bvi='on'] select,
+html[data-bvi='on'] h4, html[data-bvi='on'] h5, html[data-bvi='on'] h6 { font-size: var(--bvi-font) !important; }
+html[data-bvi='on'] h1 { font-size: calc(var(--bvi-font) * 2) !important; }
+html[data-bvi='on'] h2 { font-size: calc(var(--bvi-font) * 1.6) !important; }
+html[data-bvi='on'] h3 { font-size: calc(var(--bvi-font) * 1.3) !important; }
+
+/* Ссылки */
+html[data-bvi='on'] a, html[data-bvi='on'] a * { color: var(--bvi-link) !important; text-decoration: underline !important; }
+
+/* Подсветка при наведении/фокусе: ссылки, кнопки и кликабельные блоки (карточки —
+   это <a>/<button>) заливаются акцентным цветом выбранной схемы, текст внутри —
+   цветом фона. Цвет подсветки зависит от палитры (--bvi-link). */
+html[data-bvi='on'] a:hover,
+html[data-bvi='on'] a:focus-visible,
+html[data-bvi='on'] button:hover,
+html[data-bvi='on'] button:focus-visible {
+  background-color: var(--bvi-link) !important;
+  color: var(--bvi-bg) !important;
+  outline: 2px solid var(--bvi-fg) !important;
+}
+html[data-bvi='on'] a:hover *,
+html[data-bvi='on'] a:focus-visible *,
+html[data-bvi='on'] button:hover *,
+html[data-bvi='on'] button:focus-visible * {
+  background-color: transparent !important;
+  color: var(--bvi-bg) !important;
+}
+
+/* Полоски бургер-иконки — это background у span внутри кнопки в шапке */
+html[data-bvi='on'] header button span { background-color: var(--bvi-fg) !important; }
+
+/* Изображения: «ч-б» — оттенки серого; «выкл» — картинки и видео скрыты
+   (вместо <img> компонент BviImg рендерит блок .bvi-img-off с текстом alt);
+   «вкл» — без изменений (в цвете). */
+html[data-bvi='on'][data-bvi-images='grayscale'] img { filter: grayscale(100%); }
+html[data-bvi='on'][data-bvi-images='off'] img { display: none !important; }
+/* Иконка переключателя BVI: в режиме рисуется CSS-маской и красится цветом фона
+   схемы (--bvi-bg) — он контрастирует с акцентным фоном кнопки в любой схеме. */
+.bvi-toggle-icon {
+  display: block;
+  color: var(--color-black-g);
+}
+html[data-bvi='on'] .bvi-toggle-icon path { stroke: var(--bvi-bg) !important; }
+
+/* Плашка согласия в BVI — непрозрачный фон схемы и кнопка с видимой рамкой. */
+html[data-bvi='on'] .consent-banner { background-color: var(--bvi-bg) !important; }
+html[data-bvi='on'] .consent-accept { border: 2px solid var(--bvi-fg) !important; }
+
+/* Кнопка-переключатель BVI при включённом режиме — со своим фоном (акцент схемы). */
+html[data-bvi='on'] .bvi-toggle {
+  background-color: var(--bvi-link) !important;
+  border: 2px solid var(--bvi-fg) !important;
+  border-radius: 6px;
+}
+
+/* Плашка-замена изображения (alt-текст) в режиме «изображения выкл» */
+html[data-bvi='on'] .bvi-img-off {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8px;
+  border: 2px dashed var(--bvi-fg);
+  box-sizing: border-box;
+  font-size: var(--bvi-font);
+  overflow: hidden;
+}

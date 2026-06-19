@@ -1,0 +1,95 @@
+/* Панель рендерится только в BVI, опирается на переменные --bvi-* из app.css.
+   Размер фиксирован (app.css: html[data-bvi='on'] .bvi-panel *), панель не
+   меняется вместе с настройками текста сайта. */
+.panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 12px 28px;
+  padding: 10px 16px;
+  border-bottom: 2px solid var(--bvi-fg);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.title {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* связанная группа кнопок — общие границы (как в эталоне) */
+.btnGroup {
+  display: inline-flex;
+}
+.btnGroup > * + * {
+  margin-left: -2px;
+}
+
+.btn,
+.swatch {
+  border: 2px solid var(--bvi-fg);
+  background: transparent;
+  color: var(--bvi-fg);
+  cursor: pointer;
+  font: inherit;
+  line-height: 1;
+}
+
+.btn {
+  min-width: 42px;
+  padding: 7px 12px;
+  text-align: center;
+}
+
+.btn[aria-pressed='true'] {
+  background: var(--bvi-fg) !important;
+  color: var(--bvi-bg) !important;
+  font-weight: 700;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.swatch {
+  width: 42px;
+  height: 40px;
+  font-weight: 700;
+}
+
+.swatch[aria-pressed='true'] {
+  outline: 3px solid var(--bvi-link);
+  outline-offset: -2px;
+  position: relative;
+  z-index: 1;
+}
+
+.collapsed {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 14px;
+  border-bottom: 2px solid var(--bvi-fg);
+}
+
+.show {
+  border: 2px solid var(--bvi-fg);
+  background: transparent;
+  color: var(--bvi-fg);
+  padding: 6px 12px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.btn:focus-visible,
+.swatch:focus-visible,
+.show:focus-visible {
+  outline: 3px solid var(--bvi-link);
+  outline-offset: 2px;
+}

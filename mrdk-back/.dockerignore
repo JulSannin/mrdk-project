@@ -1,0 +1,28 @@
+# Контекст сборки бэкенда (Dockerfile: COPY . . → npm run build = tsc).
+# Чем меньше контекст, тем быстрее сборка; секреты в образ не тащим.
+
+# Зависимости и вывод сборки — ставятся/собираются в самом образе
+node_modules
+dist
+
+# Окружение: бэкенд получает переменные в РАНТАЙМЕ через compose, а не при сборке
+.env*
+
+# Контент-загрузки — живут в томе work_uploads, не в образе
+uploads
+
+# Git / CI
+.git
+.gitignore
+.github
+
+# Тесты и dev-инструменты — в прод-образ не нужны
+**/*.test.ts
+vitest.config.ts
+eslint.config.ts
+coverage
+
+# Прочее
+*.log
+*.md
+.dockerignore

@@ -1,0 +1,11 @@
+# Загруженный контент (events/workplan/documents/reminders) живёт в docker-томе
+# work_uploads; в git держим только скелет папок через .gitkeep.
+# Общие правила (node_modules, dist, .env, логи, ...) — в КОРНЕВОМ .gitignore.
+uploads/events/*
+uploads/workplan/*
+uploads/documents/*
+uploads/reminders/*
+!uploads/events/.gitkeep
+!uploads/workplan/.gitkeep
+!uploads/documents/.gitkeep
+!uploads/reminders/.gitkeep

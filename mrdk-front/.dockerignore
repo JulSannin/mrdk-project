@@ -1,0 +1,28 @@
+# Контекст сборки фронта (Dockerfile: COPY . . → npm run build = tsc -b && vite build).
+
+# Зависимости и вывод сборки
+node_modules
+dist
+dist-ssr
+
+# Git / CI
+.git
+.gitignore
+.github
+
+# Окружение: .env.production НУЖЕН vite build (VITE_*) — его НЕ исключаем.
+# Убираем только локальные/дев-значения, чтобы не подменяли прод-сборку.
+.env
+.env.local
+*.local
+
+# Тесты и dev-инструменты — в сборку не нужны
+**/*.test.ts
+vitest.config.ts
+eslint.config.js
+coverage
+
+# Прочее
+*.log
+README.md
+.dockerignore

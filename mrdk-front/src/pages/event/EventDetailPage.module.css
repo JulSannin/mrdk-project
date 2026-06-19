@@ -1,0 +1,99 @@
+.section {
+  max-width: 1280px;
+  margin: 20px auto;
+  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 1279px) {
+  .section {
+    max-width: 1024px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .section {
+    max-width: 768px;
+  }
+}
+
+@media (max-width: 767px) {
+  .section {
+    max-width: 100%;
+    padding: 0 20px;
+  }
+}
+
+.back {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 20px;
+  padding: 8px 16px;
+  border: 1px solid var(--color-gray);
+  border-radius: 10px;
+  color: var(--color-text);
+  font: inherit;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.back:hover {
+  border-color: var(--color-orange);
+  color: var(--color-orange);
+}
+
+.cover {
+  display: block;
+  border-radius: 10px;
+  max-width: 100%;
+  height: auto;
+
+}
+
+.description {
+  font-size: 20px;
+}
+
+.date {
+  font-size: 18px;
+  color: var(--color-black-g);
+}
+
+.galleryTitle {
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.galleryGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.galleryGrid img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.videoGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.video {
+  display: block;
+  width: 100%;
+  max-height: 80vh;
+  border-radius: 10px;
+  background: #000;
+  object-fit: contain;
+}

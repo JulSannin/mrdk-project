@@ -1,0 +1,45 @@
+.banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px 20px;
+  padding: 14px 20px;
+  background: var(--color-black-g);
+  color: var(--color-white);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.text {
+  margin: 0;
+  max-width: 880px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.button {
+  flex-shrink: 0;
+  padding: 10px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-black-g);
+  background: var(--color-yellow);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.button:hover {
+  background: var(--color-orange);
+}
+
+.button:focus-visible {
+  outline: 3px solid var(--color-white);
+  outline-offset: 2px;
+}

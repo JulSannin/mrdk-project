@@ -1,0 +1,37 @@
+name: frontend CI
+
+# Монорепо: workflow живёт в КОРНЕВОМ .github/workflows.
+# Этот job гоняется только при изменениях в mrdk-front/.
+on:
+  push:
+    branches: [main]
+    paths: ['mrdk-front/**', '.github/workflows/frontend.yml']
+  pull_request:
+    paths: ['mrdk-front/**', '.github/workflows/frontend.yml']
+
+defaults:
+  run:
+    working-directory: mrdk-front
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: mrdk-front/package-lock.json
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Tests
+        run: npm test

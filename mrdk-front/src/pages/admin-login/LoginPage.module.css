@@ -1,0 +1,72 @@
+.page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: var(--color-blue);
+}
+
+.card {
+    width: 100%;
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 32px 28px;
+    background: var(--color-white);
+    border-radius: 14px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+}
+
+.title {
+    margin: 0 0 6px;
+    font-size: 22px;
+    text-align: center;
+    color: var(--color-black-g);
+}
+
+.input {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 16px;
+    color: var(--color-black-g);
+    border: 2px solid var(--color-gray);
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input:focus-visible {
+    border-color: var(--color-blue);
+    box-shadow: 0 0 0 3px rgba(33, 118, 255, 0.2);
+}
+
+.button {
+    margin-top: 4px;
+    padding: 12px 14px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-white);
+    background: var(--color-blue);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.button:hover:not(:disabled) {
+    background: #1a5fd0;
+}
+
+.button:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.error {
+    margin: 0;
+    text-align: center;
+    font-size: 14px;
+    color: #c62828;
+}

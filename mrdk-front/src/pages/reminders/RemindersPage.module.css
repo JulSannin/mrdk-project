@@ -1,0 +1,95 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px auto;
+  gap: 20px;
+  max-width: 1280px;
+  padding: 0 16px;
+}
+
+.title {
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  list-style: none;
+  grid-template-columns: repeat(2, minmax(300px, 400px));
+  gap: 20px;
+  width: 100%;
+}
+
+/* li-обёртка — грид-контейнер: карточка тянется на всю ячейку (важно для <button>,
+   у которого ширина по умолчанию fit-content). */
+.grid > li {
+  display: grid;
+}
+
+@media (max-width: 767px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, max(300px));
+  }
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.85);
+  cursor: zoom-out;
+  animation: overlay-in 0.2s ease both;
+}
+
+.popupImage {
+  max-width: 95%;
+  max-height: 95%;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  cursor: default;
+  animation: image-in 0.2s ease both;
+}
+
+.close {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  line-height: 1;
+  color: var(--color-white);
+  background-color: rgba(255, 255, 255, 0.15);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.close:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes image-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .popupImage {
+    animation: none;
+  }
+}

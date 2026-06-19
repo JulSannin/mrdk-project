@@ -1,0 +1,76 @@
+.event-card-link {
+    width: 100%;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.event-card {
+    width: 100%;
+    height: 500px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: var(--color-blue);
+    transition: transform 0.3s ease-in-out;
+}
+
+.event-card:hover {
+    transform: scale(1.02);
+}
+
+.event-card__image-wrap {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.event-card__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease-in-out;
+}
+
+.event-card__image:hover {
+    transform: scale(1.04);
+}
+
+.event-card__date {
+    margin: 4px 10px 0;
+    color: var(--color-white);
+    font-weight: 600;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.event-card__title {
+    margin: 6px 10px 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-yellow);
+}
+
+.event-card__description {
+    margin: 6px 10px 10px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-white);
+    overflow: hidden;
+}
+
+@media (max-width: 1280px) {
+    .event-card {
+        height: 400px;
+    }
+
+    .event-card__title {
+        font-size: 16px;
+    }
+
+    .event-card__description {
+        font-size: 14px;
+    }
+}

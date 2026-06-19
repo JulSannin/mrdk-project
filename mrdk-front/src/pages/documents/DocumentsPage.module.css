@@ -1,0 +1,36 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px auto;
+  gap: 20px;
+  max-width: 1280px;
+}
+
+.title {
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  list-style: none;
+  margin: 0 10px;
+  grid-template-columns: repeat(3, minmax(200px, 400px));
+  gap: 10px;
+}
+
+/* li-обёртка — грид-контейнер, чтобы карточка тянулась на всю ячейку */
+.grid > li {
+  display: grid;
+}
+
+@media (max-width: 767px) {
+  .grid {
+    max-width: 620px;
+    grid-template-columns: repeat(2, minmax(150px, 300px));
+  }
+}
+.empty {
+  font-size: 18px;
+  color: var(--color-black-g);
+}
