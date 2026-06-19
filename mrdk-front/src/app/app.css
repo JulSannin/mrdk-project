@@ -60,9 +60,9 @@ body,
   display: flex;
   flex-direction: column;
   gap: 20px;
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
-  max-height: 1000vh;
+  min-height: 100dvh;
 }
 
 /* Липкая верхняя полоса: панель BVI (если включена) + шапка едут вместе и
