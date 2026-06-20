@@ -40,7 +40,7 @@ export function EventDetailPage() {
           ))}
         </div>
         {event.images && event.images.length > 0 && (
-          <div>
+          <div className={styles.gallery}>
             <h2 className={styles.galleryTitle}>Фотографии</h2>
             <div className={styles.galleryGrid}>
               {event.images.map((img) => (
