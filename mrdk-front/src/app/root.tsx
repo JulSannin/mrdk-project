@@ -11,6 +11,8 @@ import { useYandexMetrika } from '../shared/analytics/useYandexMetrika';
 export default function RootLayout() {
   const { pathname } = useLocation();
   const topbarRef = useRef<HTMLDivElement>(null);
+  const mainRef = useRef<HTMLElement>(null);
+  const firstRenderRef = useRef(true);
   const hideChrome = pathname === '/login' || pathname.startsWith('/admin');
   const bvi = useBvi();
 
@@ -20,6 +22,13 @@ export default function RootLayout() {
   // пагинация меняет только ?page, путь не трогает, поэтому сюда не попадает.
   useEffect(() => {
     window.scrollTo(0, 0);
+    // на самой первой загрузке фокус не трогаем; при переходах уводим его в <main>,
+    // чтобы скринридер озвучил новую страницу, а не остался на старой ссылке/карточке.
+    if (firstRenderRef.current) {
+      firstRenderRef.current = false;
+      return;
+    }
+    mainRef.current?.focus();
   }, [pathname]);
 
   // Высоту липкой полосы (панель BVI + шапка) кладём в --topbar-h, чтобы
@@ -55,11 +64,12 @@ export default function RootLayout() {
   // публичных страницах он не нужен и лишь зря дёргал /auth/me на каждой загрузке.
   return (
     <>
+      <a href="#main" className="skip-link">Перейти к содержимому</a>
       <div className="topbar" ref={topbarRef}>
         <BviPanel />
         <Header />
       </div>
-      <main className="site-main">
+      <main id="main" ref={mainRef} tabIndex={-1} className="site-main">
         <Outlet />
       </main>
       <Footer />

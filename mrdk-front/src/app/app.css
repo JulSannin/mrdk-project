@@ -86,6 +86,32 @@ body,
   border: 0;
 }
 
+/* «Перейти к содержимому» — скрыта, пока не получит фокус с клавиатуры.
+   Позволяет не протабывать панель BVI и шапку на каждой странице.
+   Тёмный фон + белый текст — заведомо контрастно (AA). */
+.skip-link {
+  position: absolute;
+  left: 8px;
+  top: -56px;
+  z-index: 100;
+  padding: 10px 16px;
+  background: var(--color-black-g);
+  color: var(--color-white);
+  border-radius: 0 0 8px 8px;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* <main> фокусируется программно при переходах (для скринридеров) —
+   рамку вокруг всей области не показываем, она тут не нужна. */
+.site-main:focus {
+  outline: none;
+}
+
 
 /* ── Версия для слабовидящих ───────────────────────────────────
    Управляется data-атрибутами на <html> (см. BviContext):

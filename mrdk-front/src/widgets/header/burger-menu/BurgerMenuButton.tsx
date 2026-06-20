@@ -11,9 +11,12 @@ function BurgerMenuButton({
 
     return (
         <button
+            type="button"
             className={styles.burger__button}
             onClick={onToggle}
             aria-label={isOpen ? 'Закрыть меню' : 'Открыть меню'}
+            aria-expanded={isOpen}
+            aria-controls="burger-menu"
         >
             {[...Array(3)].map((_, i) => (
                 <span key={i} className={spanClass} />

@@ -20,6 +20,8 @@ function BurgerMenuPanel({
                 onClick={onClose}
             />
             <nav
+                id="burger-menu"
+                aria-label="Меню"
                 className={[
                     styles.burger__panel,
                     'bvi-burger-panel',
