@@ -28,7 +28,9 @@ export default function RootLayout() {
       firstRenderRef.current = false;
       return;
     }
-    mainRef.current?.focus();
+    // preventScroll — иначе браузер «подскроллит» <main> (под липкой topbar) в зону
+    // видимости и страница прыгнет вниз; scrollTo(0,0) выше уже увёл наверх.
+    mainRef.current?.focus({ preventScroll: true });
   }, [pathname]);
 
   // Высоту липкой полосы (панель BVI + шапка) кладём в --topbar-h, чтобы
