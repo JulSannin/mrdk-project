@@ -69,10 +69,7 @@ export async function createEvent(req: Request, res: Response, next: NextFunctio
     res.status(400).json({ error: { message: 'Ошибка валидации', statusCode: 400, details: errors.array() } });
     return;
   }
-  if (!req.file) {
-    res.status(400).json({ error: { message: 'Файл изображения обязателен', statusCode: 400 } });
-    return;
-  }
+  // Изображение необязательно: без файла image_path=NULL, на сайте показывается заглушка (/default.jpg).
   try {
     const { title, description, eventDate } = req.body as { title: string; description?: string; eventDate: string };
     const result = await pool.query(
@@ -177,6 +174,24 @@ export async function deleteEventImage(req: Request, res: Response, next: NextFu
     if (rec.image_path) {
       fs.promises.unlink(rec.image_path)
         .catch(e => logger.error('Не удалось удалить файл', { path: rec.image_path, error: e.message }));
+    }
+    res.status(204).send();
+  } catch (err) { next(err); }
+}
+
+// Удаляет ТОЛЬКО основное изображение события: image_path -> NULL + файл с диска.
+// Галерея/видео не трогаются; на сайте после этого показывается заглушка (/default.jpg).
+export async function deleteEventMainImage(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const found = await pool.query('SELECT image_path FROM events WHERE id = $1', [req.params.id]);
+    if (found.rows.length === 0) {
+      res.status(404).json({ error: { message: 'Не найдено', statusCode: 404 } }); return;
+    }
+    const oldPath = found.rows[0].image_path;
+    await pool.query('UPDATE events SET image_path = NULL, updated_at = NOW() WHERE id = $1', [req.params.id]);
+    if (oldPath) {
+      fs.promises.unlink(oldPath)
+        .catch(e => logger.error('Не удалось удалить файл', { path: oldPath, error: e.message }));
     }
     res.status(204).send();
   } catch (err) { next(err); }

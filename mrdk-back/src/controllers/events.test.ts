@@ -10,15 +10,15 @@ vi.mock('../config/logger.js', () => ({
 }));
 
 import pool from '../config/db.js';
-import { getEvents, getEventYears } from './events.js';
+import { getEvents, getEventYears, deleteEventMainImage } from './events.js';
 
 const query = pool.query as unknown as Mock;
 
 function mockRes() {
-  const res = { json: vi.fn(), set: vi.fn(), status: vi.fn() };
+  const res = { json: vi.fn(), set: vi.fn(), status: vi.fn(), send: vi.fn() };
   res.status.mockReturnValue(res);
   res.set.mockReturnValue(res);
-  return res as unknown as Response & { json: Mock; set: Mock; status: Mock };
+  return res as unknown as Response & { json: Mock; set: Mock; status: Mock; send: Mock };
 }
 
 beforeEach(() => { query.mockReset(); });
@@ -83,5 +83,27 @@ describe('getEventYears', () => {
     const res = mockRes();
     await getEventYears({} as Request, res, vi.fn());
     expect(res.json).toHaveBeenCalledWith({ data });
+  });
+});
+
+describe('deleteEventMainImage', () => {
+  it('сбрасывает image_path в NULL и отвечает 204', async () => {
+    query
+      .mockResolvedValueOnce({ rows: [{ image_path: 'uploads/events/x.jpg' }] }) // SELECT
+      .mockResolvedValueOnce({ rows: [] });                                       // UPDATE
+    const res = mockRes();
+    await deleteEventMainImage({ params: { id: 5 } } as unknown as Request, res, vi.fn());
+    expect(query.mock.calls[1][0]).toContain('UPDATE events SET image_path = NULL');
+    expect(query.mock.calls[1][1]).toEqual([5]);
+    expect(res.status).toHaveBeenCalledWith(204);
+    expect(res.send).toHaveBeenCalled();
+  });
+
+  it('несуществующее событие → 404, UPDATE не выполняется', async () => {
+    query.mockResolvedValueOnce({ rows: [] }); // SELECT пусто
+    const res = mockRes();
+    await deleteEventMainImage({ params: { id: 999 } } as unknown as Request, res, vi.fn());
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(query).toHaveBeenCalledTimes(1); // только SELECT, без UPDATE
   });
 });

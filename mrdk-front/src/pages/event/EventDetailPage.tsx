@@ -27,9 +27,11 @@ export function EventDetailPage() {
         <button type="button" className={styles.back} onClick={() => navigate(-1)}>
           ← Назад
         </button>
-        {event.image_path && (
-          <BviImg className={styles.cover} src={`/${event.image_path}`} alt={event.title} />
-        )}
+        <BviImg
+          className={styles.cover}
+          src={event.image_path ? `/${event.image_path}` : '/default.jpg'}
+          alt={event.title}
+        />
         <h1>{event.title}</h1>
         {event.event_date && (
           <time className={styles.date}>{formatDate(event.event_date)}</time>

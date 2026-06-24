@@ -1,5 +1,5 @@
 import {
-  List, Datagrid, TextField, DateField,
+  List, Datagrid, TextField,
   Create, Edit, SimpleForm, TextInput, ImageInput, ImageField, required,
   useRecordContext,
 } from 'react-admin';
@@ -22,7 +22,6 @@ export const ReminderList = () => (
     <Datagrid rowClick="edit">
       <RowNumberField label="№" />
       <TextField source="title" label="Название" sortable={false} />
-      <DateField source="created_at" label="Создано" showTime sortable={false} />
     </Datagrid>
   </List>
 );

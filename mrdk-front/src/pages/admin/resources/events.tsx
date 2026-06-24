@@ -128,18 +128,53 @@ const VideoManager = () => {
 
 const CurrentMainImage = () => {
   const record = useRecordContext();
+  const notify = useNotify();
+  const [deleted, setDeleted] = useState(false);
   const imagePath = record?.image_path as string | null | undefined;
 
-  if (!imagePath) return null;
+  const handleDelete = async () => {
+    try {
+      await apiClient.delete(`/events/${record!.id}/image`);
+      setDeleted(true);
+    } catch {
+      notify('Не удалось удалить изображение', { type: 'error' });
+    }
+  };
+
+  if (!imagePath || deleted) {
+    return (
+      <div style={{ marginBottom: 16 }}>
+        <p style={{ marginBottom: 8, fontWeight: 600 }}>Основное изображение не задано</p>
+        <p style={{ marginBottom: 8, color: '#666', fontSize: 13 }}>
+          На сайте показывается заглушка. Загрузите фото ниже, чтобы заменить её.
+        </p>
+        <img src="/default.jpg" alt="" style={{ width: 200, height: 'auto', borderRadius: 4, opacity: 0.6 }} />
+      </div>
+    );
+  }
 
   return (
     <div style={{ marginBottom: 16 }}>
       <p style={{ marginBottom: 8, fontWeight: 600 }}>Текущее основное изображение</p>
-      <img
-        src={`/${imagePath}`}
-        alt=""
-        style={{ width: 200, height: 'auto', borderRadius: 4 }}
-      />
+      <div style={{ position: 'relative', display: 'inline-block' }}>
+        <img
+          src={`/${imagePath}`}
+          alt=""
+          style={{ width: 200, height: 'auto', borderRadius: 4, display: 'block' }}
+        />
+        <button
+          type="button"
+          onClick={handleDelete}
+          style={{
+            position: 'absolute', top: 4, right: 4,
+            background: 'rgba(0,0,0,0.6)', color: '#fff',
+            border: 'none', borderRadius: 4, cursor: 'pointer',
+            padding: '2px 6px', fontSize: 12,
+          }}
+        >
+          Удалить
+        </button>
+      </div>
     </div>
   );
 };
@@ -152,9 +187,8 @@ export const EventCreate = () => (
       <RuDateInput source="eventDate" label="Дата мероприятия" validate={required()} />
       <ImageInput
         source="image"
-        label="Изображение"
+        label="Изображение (необязательно — без него на сайте будет заглушка)"
         accept={{ 'image/*': ['.jpg', '.jpeg', '.png', '.webp'] }}
-        validate={required()}
       >
         <ImageField source="src" title="title" />
       </ImageInput>

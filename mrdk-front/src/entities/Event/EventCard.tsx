@@ -19,15 +19,13 @@ function EventCard({ event, priority = false }: { event: Event; priority?: boole
     >
       <article id={`event-${event.id}`} className={styles['event-card']}>
         <div className={styles['event-card__image-wrap']}>
-          {event.image_path && (
-            <BviImg
-              className={styles['event-card__image']}
-              src={`/${event.image_path}`}
-              alt={event.title}
-              loading={priority ? 'eager' : 'lazy'}
-              fetchPriority={priority ? 'high' : undefined}
-            />
-          )}
+          <BviImg
+            className={styles['event-card__image']}
+            src={event.image_path ? `/${event.image_path}` : '/default.jpg'}
+            alt={event.title}
+            loading={priority ? 'eager' : 'lazy'}
+            fetchPriority={priority ? 'high' : undefined}
+          />
         </div>
         <time className={styles['event-card__date']}>
           {formatDate(event.event_date)}
