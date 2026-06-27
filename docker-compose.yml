@@ -2,8 +2,11 @@ services:
   postgres:
     image: postgres:16-alpine
     restart: unless-stopped
+    # Только localhost: бэкенд ходит в БД по внутренней docker-сети (postgres:5432),
+    # наружу публиковать НЕ нужно. 127.0.0.1 — чтобы СУБД не торчала в интернет,
+    # но оставалась доступной с самого хоста (psql/дамп после SSH на сервер).
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     environment:
       POSTGRES_DB: mrdk
       POSTGRES_USER: mrdk
