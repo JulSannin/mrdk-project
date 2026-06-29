@@ -55,11 +55,14 @@ app.set('trust proxy', 1);
 
 app.use('/health', healthRouter);
 
-app.use(generalLimiter);
-
+// Статика загрузок (только dev; в проде /uploads отдаёт nginx) — ДО лимитера,
+// иначе каждая картинка считается в rate-limit: при активных обновлениях дев
+// упирается в 100/60с и отдаёт 429 на всё (данные и картинки) → «зависание».
 if (process.env.NODE_ENV !== 'production') {
     app.use('/uploads', express.static('uploads'));
 }
+
+app.use(generalLimiter);
 
 app.use('/auth', authRouter);
 app.use('/events', eventsRouter);

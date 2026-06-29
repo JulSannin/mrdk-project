@@ -4,7 +4,7 @@ import ReactPaginate from '../../shared/lib/reactPaginate';
 import { useQuery } from '@tanstack/react-query';
 import type { ApiList, Reminder } from '../../entities/types';
 import apiClient from '../../shared/lib/apiClient';
-import { Skeleton } from '../../shared/ui/Skeleton';
+import uiStyles from '../../shared/ui/ui.module.css';
 import { ErrorMessage } from '../../shared/ui/ErrorMessage';
 import { BviImg } from '../../shared/ui/BviImg';
 import { ReminderCard } from '../../entities/Reminder/ReminderCard';
@@ -52,22 +52,28 @@ export function RemindersPage() {
     };
   }, [selected]);
 
-  if (isPending) return <><Skeleton height="400px" /> <ExternalLinkCards /></>;
   if (isError) return <><ErrorMessage onRetry={() => refetch()} /> <ExternalLinkCards /> </>;
 
-  const reminders = data.data;
-  const pageCount = Math.ceil(data.total / LIMIT);
+  const reminders = data?.data ?? [];
+  const pageCount = data ? Math.ceil(data.total / LIMIT) : 0;
 
   return (
     <>
       <section className={styles.section}>
         <h1 className={styles.title}>Памятки</h1>
-        <ul className={styles.grid}>
-          {reminders.map((reminder) => (
-            <li key={reminder.id}>
-              <ReminderCard reminder={reminder} onOpen={setSelected} />
-            </li>
-          ))}
+        <ul
+          key={isPending ? 'skeleton' : `page-${page}`}
+          className={`${styles.grid} ${isPending ? '' : uiStyles.fadeIn}`}
+        >
+          {isPending
+            ? Array.from({ length: LIMIT }, (_, i) => (
+                <li key={i} className={uiStyles.reminderSkeleton} />
+              ))
+            : reminders.map((reminder) => (
+                <li key={reminder.id}>
+                  <ReminderCard reminder={reminder} onOpen={setSelected} />
+                </li>
+              ))}
         </ul>
 
         {pageCount > 1 && (

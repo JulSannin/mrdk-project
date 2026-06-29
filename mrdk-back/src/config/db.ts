@@ -7,6 +7,12 @@ types.setTypeParser(types.builtins.DATE, (value) => value);
 
 const pool = new Pool({connectionString: process.env.DATABASE_URL});
 
+// Без этого обработчика ошибка ПРОСТАИВАЮЩЕГО соединения (БД перезапустилась,
+// сеть/таймаут оборвали коннект) всплывает как uncaughtException и роняет процесс.
+pool.on('error', (err) => {
+    logger.error('Ошибка простаивающего соединения БД', { error: err.message });
+});
+
 pool.connect()
     .then(client => {
         client.release();

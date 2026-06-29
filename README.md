@@ -19,7 +19,7 @@ work/
 ├── nginx/nginx.conf     # Прод-роутинг: статика dist, прокси /api, /uploads, CSP
 ├── secrets/             # Docker secret: admin_password (вне git)
 ├── docs/OPERATIONS.md   # Подробная техдокументация
-├── docker-compose.yml   # postgres + backend + nginx
+├── docker-compose.yml   # postgres + backend + nginx + certbot (авто-renew TLS)
 └── deploy.sh / backup.sh / restore.sh
 ```
 

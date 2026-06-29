@@ -9,6 +9,8 @@ import { formatDate } from '../../shared/lib/dateHelpers';
 import ExternalLinkCards from '../../widgets/listExternalLinksCards/ExternalLinkCards';
 import VideoBlock from '../../widgets/videoBlock/VideoBlock';
 import styles from './EventDetailPage.module.css';
+import { useDocumentTitle } from '../../shared/lib/useDocumentTitle';
+import uiStyles from '../../shared/ui/ui.module.css';
 
 export function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -18,12 +20,28 @@ export function EventDetailPage() {
     queryFn: () => apiClient.get<ApiSingle<Event>>(`/events/${id}`).then((r) => r.data.data),
   });
 
-  if (isPending) return <><Skeleton height="400px" /><ExternalLinkCards /></>;
+  // <title> из названия события (пока грузится — «Событие»). Вызов до ранних return — правило хуков.
+  useDocumentTitle(event?.title ?? 'Событие');
+
+  if (isPending) return (
+    <>
+      <article className={styles.section}>
+        <Skeleton height="400px" />
+        <Skeleton height="32px" width="60%" />
+        <Skeleton height="18px" width="30%" />
+        <Skeleton height="16px" />
+        <Skeleton height="16px" />
+        <Skeleton height="16px" width="80%" />
+      </article>
+      <ExternalLinkCards />
+      <VideoBlock />
+    </>
+  );
   if (isError) return <><ErrorMessage message="Не удалось загрузить событие" onRetry={() => refetch()} /><ExternalLinkCards /></>;
 
   return (
     <>
-      <article className={styles.section}>
+      <article className={`${styles.section} ${uiStyles.fadeIn}`}>
         <button type="button" className={styles.back} onClick={() => navigate(-1)}>
           ← Назад
         </button>

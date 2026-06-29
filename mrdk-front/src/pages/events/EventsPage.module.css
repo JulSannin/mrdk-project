@@ -73,40 +73,8 @@
   display: grid;
 }
 
-/* плавное появление сетки — при первой загрузке и на каждой смене страницы */
-.fade-in {
-  animation: fade-in 0.7s ease both;
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* скелетон в форме карточки — тот же layout, что и реальная сетка, поэтому без скачка */
-.card-skeleton {
-  width: 100%;
-  height: 500px;
-  border-radius: 10px;
-  background: linear-gradient(90deg, #eee 25%, #f5f5f5 37%, #eee 63%);
-  background-size: 400% 100%;
-  animation: skeleton-shimmer 1.4s ease infinite;
-}
-
-@keyframes skeleton-shimmer {
-  0% {
-    background-position: 100% 0;
-  }
-  100% {
-    background-position: 0 0;
-  }
-}
+/* Появление сетки (.fadeIn) и карточка-заглушка (.cardSkeleton) — общие,
+   в shared/ui/ui.module.css. */
 
 /* Колонки растут монотонно с шириной (без «скачков» назад), всё по центру.
    До 1280px карточка ≤300px (1 → 2 → 3 кол); с 1280px карточка ≤400px (3 → 4 → 5 кол).
@@ -115,13 +83,3 @@
 @media (min-width: 940px)  { .events-grid { grid-template-columns: repeat(3, minmax(0, 300px)); } }
 @media (min-width: 1280px) { .events-grid { grid-template-columns: repeat(4, minmax(0, 300px)); } }
 @media (min-width: 1660px) { .events-grid { grid-template-columns: repeat(4, minmax(0, 400px)); } }
-
-@media (prefers-reduced-motion: reduce) {
-  .fade-in {
-    animation: none;
-  }
-
-  .card-skeleton {
-    animation: none;
-  }
-}

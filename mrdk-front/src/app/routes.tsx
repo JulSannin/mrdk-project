@@ -31,18 +31,20 @@ export const router = createBrowserRouter([
     // ловит необработанные ошибки рендера любой страницы — вместо белого экрана
     errorElement: <RouteError />,
     children: [
-      { path: '/', element: <HomePage /> },
-      { path: '/events', element: <EventsPage /> },
+      // handle.title → <title> "<раздел> — <SITE_NAME>"; { title: null } = только имя сайта.
+      // У /events/:id и /admin/* handle нет — там title ставит сама страница / react-admin.
+      { path: '/', element: <HomePage />, handle: { title: null } },
+      { path: '/events', element: <EventsPage />, handle: { title: 'События' } },
       { path: '/events/:id', element: <EventDetailPage /> },
-      { path: '/clubs', element: <ClubsPage /> },
-      { path: '/workplan', element: <WorkPlanPage /> },
-      { path: '/documents', element: <DocumentsPage /> },
-      { path: '/reminders', element: <RemindersPage /> },
-      { path: '/anticorruption', element: <AntiCorruptionPage /> },
-      { path: '/contacts', element: <ContactsPage /> },
-      { path: '/login', element: <Suspense fallback={null}><LoginPage /></Suspense> },
+      { path: '/clubs', element: <ClubsPage />, handle: { title: 'Клубы и секции' } },
+      { path: '/workplan', element: <WorkPlanPage />, handle: { title: 'Планы работы' } },
+      { path: '/documents', element: <DocumentsPage />, handle: { title: 'Документы' } },
+      { path: '/reminders', element: <RemindersPage />, handle: { title: 'Памятки' } },
+      { path: '/anticorruption', element: <AntiCorruptionPage />, handle: { title: 'Противодействие коррупции' } },
+      { path: '/contacts', element: <ContactsPage />, handle: { title: 'Контакты' } },
+      { path: '/login', element: <Suspense fallback={null}><LoginPage /></Suspense>, handle: { title: 'Вход в админ-панель' } },
       { path: '/admin/*', element: <Suspense fallback={null}><AdminApp /></Suspense> },
-      { path: '*', element: <NotFoundPage /> },
+      { path: '*', element: <NotFoundPage />, handle: { title: 'Страница не найдена' } },
     ],
   },
 ]);

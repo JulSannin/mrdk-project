@@ -8,6 +8,7 @@ import ExternalLinkCards from '../../widgets/listExternalLinksCards/ExternalLink
 import VideoBlock from '../../widgets/videoBlock/VideoBlock';
 import ReactPaginate from '../../shared/lib/reactPaginate';
 import styles from './EventsPage.module.css';
+import uiStyles from '../../shared/ui/ui.module.css';
 
 const LIMIT = 24;
 
@@ -90,11 +91,11 @@ export function EventsPage() {
         {/* key меняется при первой загрузке, на каждой странице и при смене года -> fade-in проигрывается заново */}
         <ul
           key={isPending ? 'skeleton' : `y-${year ?? 'all'}-page-${page}`}
-          className={`${styles['events-grid']} ${styles['fade-in']}`}
+          className={`${styles['events-grid']} ${isPending ? '' : uiStyles.fadeIn}`}
         >
           {isPending
             ? Array.from({ length: LIMIT }, (_, i) => (
-                <li key={i} className={styles['card-skeleton']} />
+                <li key={i} className={uiStyles.cardSkeleton} />
               ))
             : events.map((event, i) => (
                 <li key={event.id}>

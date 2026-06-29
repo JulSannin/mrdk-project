@@ -8,6 +8,7 @@ import EventCard from '../../entities/Event/EventCard';
 import ExternalLinkCards from '../../widgets/listExternalLinksCards/ExternalLinkCards';
 import VideoBlock from '../../widgets/videoBlock/VideoBlock';
 import styles from './HomePage.module.css';
+import uiStyles from '../../shared/ui/ui.module.css';
 
 const MAX_CARDS = 20;
 
@@ -55,10 +56,14 @@ export function HomePage() {
         {isError ? (
           <ErrorMessage onRetry={() => refetch()} />
         ) : (
-          <ul ref={measureGrid} className={styles.grid}>
+          <ul
+            ref={measureGrid}
+            key={isPending ? 'skeleton' : 'content'}
+            className={`${styles.grid} ${isPending ? '' : uiStyles.fadeIn}`}
+          >
             {isPending
               ? Array.from({ length: visible }, (_, i) => (
-                  <li key={i} className={styles.cardSkeleton} />
+                  <li key={i} className={uiStyles.cardSkeleton} />
                 ))
               : data.data.slice(0, visible).map((event, i) => (
                   <li key={event.id}>

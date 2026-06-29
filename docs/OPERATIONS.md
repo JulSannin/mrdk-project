@@ -97,7 +97,7 @@
 ### Админские (cookie + роль `admin`)
 | Ресурс | Операции |
 |--------|----------|
-| **events** | `POST /events`; `POST /:id/images` (≤10), `DELETE /:id/images/:imageId`; `POST /:id/videos` (≤10), `DELETE /:id/videos/:videoId`; `PATCH /:id`; `DELETE /:id` |
+| **events** | `POST /events` (фото необязательно — без него `image_path=NULL`, на сайте заглушка); `POST /:id/images` (≤10), `DELETE /:id/images/:imageId`; `POST /:id/videos` (≤10), `DELETE /:id/videos/:videoId`; `DELETE /:id/image` (сброс основного фото в `NULL`); `PATCH /:id`; `DELETE /:id` |
 | **documents / workplan** | `POST` · `PATCH /:id` · `DELETE /:id` (с файлом; у workplan поля `year`/`month`) |
 | **reminders** | `POST` · `PATCH /:id` · `DELETE /:id` (с изображением) |
 | **clubs** | `POST` · `PATCH /:id` · `DELETE /:id` |
@@ -231,12 +231,31 @@ Content-Security-Policy задаётся в **двух** местах; при д
 
 ---
 
+## Заголовки безопасности (nginx)
+
+Помимо CSP, в [nginx/nginx.conf](../nginx/nginx.conf) на отдаваемый контент навешены (в `location /` и `location /uploads/`):
+
+| Заголовок | Значение | Зачем |
+|-----------|----------|-------|
+| `Strict-Transport-Security` | `max-age=31536000; includeSubDomains` | браузер принудительно ходит по HTTPS (анти-SSL-strip). `preload` намеренно не включён |
+| `X-Content-Type-Options` | `nosniff` | запрет MIME-sniffing (особенно важно на `/uploads/`) |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` | не утекает полный URL во внешние переходы |
+| `Permissions-Policy` | `geolocation=(), camera=(), microphone=()` | отключены неиспользуемые браузерные API |
+
+Плюс `server_tokens off` в обоих server-блоках — скрывает версию nginx в заголовке `Server`.
+
+> Грабля: `add_header` **не наследуется** в блок, где есть собственный `add_header`. Поэтому заголовки продублированы в `location /` (рядом с CSP) и в `location /uploads/`. На `/api/` их не ставим — там заголовки выставляет helmet (иначе дубль/конфликт). HSTS, увиденный браузером на HTML-документе, применяется ко всему origin, включая `/api`.
+
+> Проверка снаружи: `curl -sI https://<домен>/ | grep -iE 'strict-transport|x-content-type|referrer|permissions|^server'`.
+
+---
+
 ## Известные проблемы
 
-### Вход в админку не работает по `http://` (Secure-кука)
-**Симптом:** логин проходит (200), но админка «не пускает» — `/api/auth/me` → 401, редирект на `/login`.
+### Вход в админку по `http://` (Secure-кука) — РЕШЕНО на проде
+**Симптом (был):** логин проходит (200), но админка «не пускает» — `/api/auth/me` → 401, редирект на `/login`.
 **Причина:** auth-кука с флагом `Secure` (`cookieOptions.secure = NODE_ENV === 'production'` в [middleware/auth.ts](../mrdk-back/src/middleware/auth.ts)); браузер не сохраняет Secure-куку по обычному HTTP (кроме `http://localhost` в Chrome).
-**Решение:** HTTPS на проде (см. [HTTPS на проде](#https-на-проде)). Публичная часть сайта по HTTP работает полностью — упирается только вход в админку.
+**Статус:** на проде поднят HTTPS (см. [HTTPS на проде](#https-на-проде)) → Secure-кука работает, вход исправен. Проявится снова только если открыть прод по голому `http://`. Публичная часть сайта по HTTP работала полностью — упирался только вход в админку.
 
 ---
 
@@ -263,9 +282,11 @@ Content-Security-Policy задаётся в **двух** местах; при д
 ## Эксплуатация — на заметку
 
 - **Загрузки** пишутся в именованный том `work_uploads`. Бэкенд работает **не от root** (`USER node`, uid 1000 — [Dockerfile](../mrdk-back/Dockerfile)); свежий том наследует владельца `node`. ⚠️ Если том уже существует и был root-овым — один раз: `docker compose down && docker run --rm -v work_uploads:/data alpine chown -R 1000:1000 /data && docker compose up -d`.
-- **Порт Postgres** проброшен наружу (`5432:5432`) — для дева удобно, для прода лучше убрать публикацию или привязать к `127.0.0.1`.
+- **Порт Postgres** привязан к `127.0.0.1:5432:5432` (только локалхост) — наружу не торчит; бэкенд ходит в БД по внутренней docker-сети (`postgres:5432`). ⚠️ Смена биндинга требует **пересоздания** контейнера (`docker compose up -d postgres`), а не `restart`. Проверка снаружи: `nc -zv <домен> 5432` → должно быть `refused`. (Docker публикует порты в обход UFW, поэтому защищает именно биндинг на `127.0.0.1`, а не фаервол.)
 - **Имена файлов:** multer отдаёт `originalname` в latin1 — чинится через `decodeOriginalName` (кириллица сохраняется).
-- **Бэкенд без graceful shutdown** — при `docker compose stop` соединения рвутся жёстко (некритично при низком трафике).
+- **Graceful shutdown** — по `SIGTERM`/`SIGINT` (`docker compose stop`) бэкенд закрывает HTTP-сервер и пул БД, с таймаутом-страховкой 10с (`server.ts`).
+- **Устойчивость БД** — `pool.on('error')` в `config/db.ts`: обрыв простаивающего соединения (перезапуск БД, сетевой таймаут) логируется, а не роняет процесс.
+- **Rate-limit и `/uploads`** — статика загрузок раздаётся Express'ом **до** `generalLimiter` (только dev), иначе каждая картинка считается в лимит 100/60с и при активных обновлениях дев упирается в 429 («зависание»). В проде `/uploads` отдаёт nginx, мимо лимитера.
 - **Почта (mail.ru):** SMTP через `smtp.mail.ru:465`, `SMTP_SECURE=true`, `SMTP_PASS` = пароль для внешних приложений (не основной пароль ящика). Проверка: `cd mrdk-back && node smtp-test.mjs`. ⚠️ некоторые VPN режут порты 25/465/587 — тогда тест проходит только с прямого/российского IP.
 
 ---

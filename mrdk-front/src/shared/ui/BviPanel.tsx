@@ -120,7 +120,7 @@ export function BviPanel() {
         <span className={styles.title}>Дополнительно</span>
         <div className={styles.btnGroup}>
           <button type="button" className={styles.btn} onClick={() => bvi.set('panelHidden', true)} title="Скрыть панель" aria-label="Скрыть панель">
-            ⌃
+            Скрыть панель
           </button>
           <button type="button" className={styles.btn} onClick={bvi.disable}>
             Обычная версия
