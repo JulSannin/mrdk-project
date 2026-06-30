@@ -5,7 +5,9 @@ import styles from './Header.module.css';
 function NavLogo() {
     return (
         <NavLink to='/' className={styles['header__logo-link']} aria-label='Перейти на главную страницу'>
-            <img className={styles['header__logo-img']} src={logo} alt='Логотип Мариинский районный дом культуры' />
+            {/* alt='' — картинка декоративная: ссылка озвучивается через aria-label выше.
+                Так alt не попадает в сниппет поисковика. */}
+            <img className={styles['header__logo-img']} src={logo} alt='' />
         </NavLink>
     );
 }

@@ -47,9 +47,19 @@ export function HomePage() {
 
   return (
     <>
+      {/* Визуально скрытый блок (sr-only): задаёт странице h1 и описание для
+          поисковика/сниппета и скринридера, но на экране не отображается. */}
+      <section className={styles.srOnly}>
+        <h1>Мариинский районный Дом культуры</h1>
+        <p>
+          Учреждение культуры Мариинского муниципального округа: афиша и фотоотчёты
+          мероприятий, клубные формирования и кружки, планы работы, документы и контакты.
+        </p>
+      </section>
+
       <section className={styles.section}>
         <div className={styles.head}>
-          <h1 className={styles.heading}>Последние события</h1>
+          <h2 className={styles.heading}>Последние события</h2>
           <Link to="/events" className={styles.allLink}>Все события →</Link>
         </div>
 
