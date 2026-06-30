@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import type { ApiList, Event } from '../../entities/types';
 import apiClient from '../../shared/lib/apiClient';
 import { ErrorMessage } from '../../shared/ui/ErrorMessage';
@@ -38,7 +38,8 @@ export function EventsPage() {
       apiClient
         .get<ApiList<Event>>('/events', { params: { page, limit: LIMIT, ...(year ? { year } : {}) } })
         .then((r) => r.data),
-    placeholderData: keepPreviousData, // при смене страницы держим прошлые карточки — без мигания
+    // без keepPreviousData: при смене страницы/года данных нет -> isPending=true ->
+    // показываем скелетон, а новые карточки проигрывают fade-in (как на первой загрузке)
   });
 
   const goToPage = (next: number) => {

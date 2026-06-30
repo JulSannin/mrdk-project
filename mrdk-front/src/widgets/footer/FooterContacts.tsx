@@ -26,7 +26,7 @@ function FooterContacts() {
             <hr className={styles.footer__contacts_hr} />
             <p className={styles.footer__contacts_info}>
                 <span className={styles.footer__contacts_info_label}>E-mail: </span>
-                <a href="mailto:rbk-pristan@mail.ru" className={styles['footer__contacts_info_mail-link']}>
+                <a href="mailto:rdk-pristan@mail.ru" className={styles['footer__contacts_info_mail-link']}>
                     rdk-pristan@mail.ru
                 </a>
                 <br />
@@ -35,7 +35,7 @@ function FooterContacts() {
                 <br />
                 <span className={styles.footer__contacts_info_label}>Телефон</span>:
                 <a 
-                    href="tel:+89230318935" 
+                    href="tel:+79230318935" 
                     className={styles['footer__contacts_info_tel-link']}
                 >
                     +8-923-031-89-35
