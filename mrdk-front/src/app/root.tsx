@@ -7,7 +7,7 @@ import { BviPanel } from '../shared/ui/BviPanel';
 import { useBvi } from '../shared/ui/BviContext';
 import { ConsentBanner } from '../widgets/consentBanner/ConsentBanner';
 import { useYandexMetrika } from '../shared/analytics/useYandexMetrika';
-import { useRouteTitle } from '../shared/lib/useDocumentTitle';
+import { useRouteMeta } from '../shared/lib/useDocumentTitle';
 
 export default function RootLayout() {
   const { pathname } = useLocation();
@@ -18,7 +18,7 @@ export default function RootLayout() {
   const bvi = useBvi();
 
   useYandexMetrika();
-  useRouteTitle(); // <title> из handle совпавшего роута (см. routes.tsx)
+  useRouteMeta(); // <title> + meta[description] из handle совпавшего роута (см. routes.tsx)
 
   // при переходе на другой путь (клик по карточке, навигация) — наверх страницы.
   // пагинация меняет только ?page, путь не трогает, поэтому сюда не попадает.

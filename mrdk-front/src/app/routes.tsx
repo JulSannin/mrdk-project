@@ -15,6 +15,7 @@ import { AntiCorruptionPage } from '../pages/anticorruption/AntiCorruptionPage';
 import { ContactsPage } from '../pages/contacts/ContactsPage';
 import { NotFoundPage } from '../pages/not-found/NotFoundPage';
 import { RouteError } from '../shared/ui/RouteError';
+import { STATIC_ROUTES } from '../shared/config/siteMeta';
 
 // Админка (react-admin + MUI) и логин грузятся отдельными чанками,
 // чтобы посетители публичного сайта их не скачивали.
@@ -31,17 +32,18 @@ export const router = createBrowserRouter([
     // ловит необработанные ошибки рендера любой страницы — вместо белого экрана
     errorElement: <RouteError />,
     children: [
-      // handle.title → <title> "<раздел> — <SITE_NAME>"; { title: null } = только имя сайта.
-      // У /events/:id и /admin/* handle нет — там title ставит сама страница / react-admin.
-      { path: '/', element: <HomePage />, handle: { title: null } },
-      { path: '/events', element: <EventsPage />, handle: { title: 'События' } },
+      // Мета (title/description) индексируемых маршрутов — в shared/config/siteMeta.ts
+      // (единый источник для роутов и пререндера). handle.title → <title>, handle.description
+      // → <meta name="description">. У /events/:id и /admin/* handle нет — мета ставит страница.
+      { path: '/', element: <HomePage />, handle: STATIC_ROUTES['/'] },
+      { path: '/events', element: <EventsPage />, handle: STATIC_ROUTES['/events'] },
       { path: '/events/:id', element: <EventDetailPage /> },
-      { path: '/clubs', element: <ClubsPage />, handle: { title: 'Клубы и секции' } },
-      { path: '/workplan', element: <WorkPlanPage />, handle: { title: 'Планы работы' } },
-      { path: '/documents', element: <DocumentsPage />, handle: { title: 'Документы' } },
-      { path: '/reminders', element: <RemindersPage />, handle: { title: 'Памятки' } },
-      { path: '/anticorruption', element: <AntiCorruptionPage />, handle: { title: 'Противодействие коррупции' } },
-      { path: '/contacts', element: <ContactsPage />, handle: { title: 'Контакты' } },
+      { path: '/clubs', element: <ClubsPage />, handle: STATIC_ROUTES['/clubs'] },
+      { path: '/workplan', element: <WorkPlanPage />, handle: STATIC_ROUTES['/workplan'] },
+      { path: '/documents', element: <DocumentsPage />, handle: STATIC_ROUTES['/documents'] },
+      { path: '/reminders', element: <RemindersPage />, handle: STATIC_ROUTES['/reminders'] },
+      { path: '/anticorruption', element: <AntiCorruptionPage />, handle: STATIC_ROUTES['/anticorruption'] },
+      { path: '/contacts', element: <ContactsPage />, handle: STATIC_ROUTES['/contacts'] },
       { path: '/login', element: <Suspense fallback={null}><LoginPage /></Suspense>, handle: { title: 'Вход в админ-панель' } },
       { path: '/admin/*', element: <Suspense fallback={null}><AdminApp /></Suspense> },
       { path: '*', element: <NotFoundPage />, handle: { title: 'Страница не найдена' } },

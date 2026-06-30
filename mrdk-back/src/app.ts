@@ -13,6 +13,7 @@ import documentsRouter from './routes/documents.js';
 import remindersRouter from './routes/reminders.js';
 import clubsRouter from './routes/clubs.js';
 import feedbackRouter from './routes/feedback.js';
+import { getSitemap } from './controllers/sitemap.js';
 
 const app = express();
 
@@ -54,6 +55,7 @@ app.use(cookieParser());
 app.set('trust proxy', 1);
 
 app.use('/health', healthRouter);
+app.get('/sitemap.xml', getSitemap); // до лимитера — краулеры не троттлятся
 
 // Статика загрузок (только dev; в проде /uploads отдаёт nginx) — ДО лимитера,
 // иначе каждая картинка считается в rate-limit: при активных обновлениях дев

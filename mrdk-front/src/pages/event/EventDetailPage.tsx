@@ -20,8 +20,14 @@ export function EventDetailPage() {
     queryFn: () => apiClient.get<ApiSingle<Event>>(`/events/${id}`).then((r) => r.data.data),
   });
 
-  // <title> из названия события (пока грузится — «Событие»). Вызов до ранних return — правило хуков.
-  useDocumentTitle(event?.title ?? 'Событие');
+  // <title> + meta description из данных события (пока грузится — дефолты).
+  // Вызов до ранних return — правило хуков. Описание режем до ~160 симв.
+  useDocumentTitle(
+    event?.title ?? 'Событие',
+    event?.description
+      ? event.description.replace(/\s+/g, ' ').trim().slice(0, 160)
+      : 'Событие Мариинского районного Дома культуры.',
+  );
 
   if (isPending) return (
     <>

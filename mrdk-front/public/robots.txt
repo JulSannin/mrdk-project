@@ -3,3 +3,5 @@ Allow: /
 Disallow: /admin
 Disallow: /login
 Disallow: /api/
+
+Sitemap: https://nn-lance.ru/sitemap.xml
