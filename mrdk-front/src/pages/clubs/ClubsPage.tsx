@@ -27,9 +27,7 @@ export function ClubsPage() {
       <section className={styles.section}>
         <h1 className={styles.title}>Клубы и секции</h1>
         {isPending ? (
-          <div
-            style={{ width: '100%', maxWidth: 800, display: 'flex', flexDirection: 'column', gap: 8 }}
-          >
+          <div className={styles.tableSkeleton}>
             {Array.from({ length: 16 }, (_, i) => (
               <Skeleton key={i} height="48px" />
             ))}
@@ -37,7 +35,7 @@ export function ClubsPage() {
         ) : (
           <div className={`${styles.tableWrapper} ${uiStyles.fadeIn}`}>
             <table className={styles.table}>
-              <caption className={styles.srOnly}>Список клубов и руководителей</caption>
+              <caption className={uiStyles.srOnly}>Список клубов и руководителей</caption>
               <thead>
                 <tr>
                   <th className={`${styles.th} ${styles.numCol}`}>№</th>

@@ -29,21 +29,27 @@ services:
       NODE_ENV: production
       PORT: 3001
       DATABASE_URL: postgresql://mrdk:${POSTGRES_PASSWORD}@postgres:5432/mrdk
-      JWT_SECRET: ${JWT_SECRET}
+      # Секреты не в env (env виден в `docker inspect`), а docker-секретами через *_FILE
+      # (server.ts разворачивает их в process.env на старте).
+      JWT_SECRET_FILE: /run/secrets/jwt_secret
+      SMTP_PASS_FILE: /run/secrets/smtp_pass
       CLIENT_ORIGIN: ${CLIENT_ORIGIN}
       GOSUSLUGI_ORIGIN: ${GOSUSLUGI_ORIGIN}
+      # Базовый URL сайта для sitemap (loc-ссылки); по умолчанию — текущий домен
+      SITE_ORIGIN: ${SITE_ORIGIN:-https://nn-lance.ru}
       ADMIN_LOGIN: ${ADMIN_LOGIN}
       ADMIN_PASSWORD_FILE: /run/secrets/admin_password
       SMTP_HOST: ${SMTP_HOST}
       SMTP_PORT: ${SMTP_PORT}
       SMTP_SECURE: ${SMTP_SECURE}
       SMTP_USER: ${SMTP_USER}
-      SMTP_PASS: ${SMTP_PASS}
       ADMIN_EMAIL: ${ADMIN_EMAIL}
     volumes:
       - uploads:/app/uploads
     secrets:
       - admin_password
+      - jwt_secret
+      - smtp_pass
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
       interval: 15s
@@ -85,3 +91,7 @@ volumes:
 secrets:
   admin_password:
     file: ./secrets/admin_password
+  jwt_secret:
+    file: ./secrets/jwt_secret
+  smtp_pass:
+    file: ./secrets/smtp_pass

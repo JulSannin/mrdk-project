@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import type { ApiList, Event } from '../../entities/types';
 import apiClient from '../../shared/lib/apiClient';
 import { ErrorMessage } from '../../shared/ui/ErrorMessage';
@@ -32,14 +32,16 @@ export function EventsPage() {
   });
   const years = yearsData ?? [];
 
-  const { data, isPending, isError, refetch } = useQuery({
+  const { data, isPending, isPlaceholderData, isError, refetch } = useQuery({
     queryKey: ['events', year, page],
     queryFn: () =>
       apiClient
         .get<ApiList<Event>>('/events', { params: { page, limit: LIMIT, ...(year ? { year } : {}) } })
         .then((r) => r.data),
-    // без keepPreviousData: при смене страницы/года данных нет -> isPending=true ->
-    // показываем скелетон, а новые карточки проигрывают fade-in (как на первой загрузке)
+    // при смене страницы/года прежние карточки остаются на экране (слегка притушены —
+    // .updating), пагинатор не размонтируется и фокус/высота не прыгают; скелетон —
+    // только на самой первой загрузке. fade-in новых карточек обеспечивает key сетки.
+    placeholderData: keepPreviousData,
   });
 
   const goToPage = (next: number) => {
@@ -89,10 +91,13 @@ export function EventsPage() {
           </div>
         )}
 
-        {/* key меняется при первой загрузке, на каждой странице и при смене года -> fade-in проигрывается заново */}
+        {/* key = первая карточка ПОКАЗАННЫХ данных: меняется, когда новая страница/год
+            реально пришли (а не в момент клика) -> fade-in проигрывается на смене
+            содержимого, но не дёргается при фоновом рефетче тех же данных */}
         <ul
-          key={isPending ? 'skeleton' : `y-${year ?? 'all'}-page-${page}`}
-          className={`${styles['events-grid']} ${isPending ? '' : uiStyles.fadeIn}`}
+          key={isPending ? 'skeleton' : `d-${events[0]?.id ?? 'empty'}`}
+          className={`${styles['events-grid']} ${isPending ? '' : uiStyles.fadeIn} ${isPlaceholderData ? uiStyles.updating : ''}`}
+          aria-busy={isPending || isPlaceholderData}
         >
           {isPending
             ? Array.from({ length: LIMIT }, (_, i) => (

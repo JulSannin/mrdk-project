@@ -5,7 +5,7 @@ import styles from './ContactsMap.module.css';
 
 const enabled = Boolean(DGIS_KEY) && mapMarkers.length > 0;
 
-export function   ContactsMap({ fallbackHref }: { fallbackHref: string }) {
+export function ContactsMap({ fallbackHref }: { fallbackHref: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

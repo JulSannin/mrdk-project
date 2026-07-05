@@ -34,7 +34,8 @@ export const router = createBrowserRouter([
     children: [
       // Мета (title/description) индексируемых маршрутов — в shared/config/siteMeta.ts
       // (единый источник для роутов и пререндера). handle.title → <title>, handle.description
-      // → <meta name="description">. У /events/:id и /admin/* handle нет — мета ставит страница.
+      // → <meta name="description">. Без handle только /events/:id — мета ставится страницей
+      // из данных события; остальным handle обязателен, иначе в табе зависает чужой title.
       { path: '/', element: <HomePage />, handle: STATIC_ROUTES['/'] },
       { path: '/events', element: <EventsPage />, handle: STATIC_ROUTES['/events'] },
       { path: '/events/:id', element: <EventDetailPage /> },
@@ -45,7 +46,7 @@ export const router = createBrowserRouter([
       { path: '/anticorruption', element: <AntiCorruptionPage />, handle: STATIC_ROUTES['/anticorruption'] },
       { path: '/contacts', element: <ContactsPage />, handle: STATIC_ROUTES['/contacts'] },
       { path: '/login', element: <Suspense fallback={null}><LoginPage /></Suspense>, handle: { title: 'Вход в админ-панель' } },
-      { path: '/admin/*', element: <Suspense fallback={null}><AdminApp /></Suspense> },
+      { path: '/admin/*', element: <Suspense fallback={null}><AdminApp /></Suspense>, handle: { title: 'Админ-панель' } },
       { path: '*', element: <NotFoundPage />, handle: { title: 'Страница не найдена' } },
     ],
   },

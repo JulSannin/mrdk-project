@@ -38,7 +38,7 @@ function FooterContacts() {
                     href="tel:+79230318935" 
                     className={styles['footer__contacts_info_tel-link']}
                 >
-                    +8-923-031-89-35
+                    +7-923-031-89-35
                 </a> , 37-1-36
             </p>
         </div>

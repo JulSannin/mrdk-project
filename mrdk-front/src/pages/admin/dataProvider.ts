@@ -13,14 +13,12 @@ const ENDPOINTS: Record<string, string> = {
 
 const DOWNLOAD_RESOURCES = ['workplan', 'documents'];
 
+// event_date приходит с бэка строкой 'YYYY-MM-DD' (DATE отдаётся как есть — см.
+// mrdk-back config/db.ts). Раундтрип через new Date() тут опасен: 'YYYY-MM-DD'
+// парсится как UTC-полночь, и в таймзонах западнее UTC дата уезжает на день назад.
 function toDateInputValue(v: unknown): string {
   if (!v) return '';
-  const d = new Date(v as string);
-  if (Number.isNaN(d.getTime())) return String(v).slice(0, 10);
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
+  return String(v).slice(0, 10);
 }
 
 function normalize(resource: string, row: ApiRecord): ApiRecord {

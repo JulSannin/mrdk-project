@@ -1,13 +1,15 @@
 # МРДК — сайт районного Дома культуры
 
-Монорепозиторий: публичный сайт + админ-панель + REST API + деплой-обвязка (Docker, nginx, CI, бэкапы). Клонируешь на сервер → `docker compose up` → работает.
+Монорепозиторий: публичный сайт + админ-панель + REST API + деплой-обвязка (Docker, nginx, CI, бэкапы). Клонируешь на сервер → создаёшь `.env` и секреты → `docker compose up` → работает.
 
-📖 **Подробная документация** (архитектура, API, переменные окружения, деплой, HTTPS, CSP, эксплуатация) — в **[docs/OPERATIONS.md](docs/OPERATIONS.md)**.
+📖 Документация:
+- **[docs/OPERATIONS.md](docs/OPERATIONS.md)** — эксплуатация: архитектура, API, переменные и секреты, деплой, HTTPS, CSP, кэширование, SEO-обвязка, бэкапы, грабли.
+- **[docs/TECHNICAL-SPECIFICATION.md](docs/TECHNICAL-SPECIFICATION.md)** — техническое задание (требования, роли, структура данных, API-контракт).
 
 ## Что это
 
-- **Публичный сайт ДК:** события (с галереей фото/видео и фильтром по годам), клубы и секции, планы работы, документы, памятки, противодействие коррупции, контакты с картой 2ГИС и формой обратной связи. Режим для слабовидящих, Яндекс.Метрика.
-- **Админ-панель** (`/admin`, react-admin): CRUD по событиям, планам работы, документам, памяткам, клубам.
+- **Публичный сайт ДК:** события с фотогалереями/видео и фильтром по годам, клубы и секции, планы работы, документы, памятки, противодействие коррупции, контакты с картой 2ГИС и формой обратной связи. Режим для слабовидящих (БВИ), Яндекс.Метрика, SEO-пререндер разделов + sitemap.
+- **Админ-панель** (`/admin`, react-admin): CRUD по событиям, планам работы, документам, памяткам, клубам; управление медиа событий.
 
 ## Структура
 
@@ -16,9 +18,10 @@ work/
 ├── .github/workflows/   # CI (backend.yml, frontend.yml) — только в корне репо
 ├── mrdk-back/           # API: Express 5 + TypeScript (ESM) + PostgreSQL
 ├── mrdk-front/          # Сайт + админка: React 18 + Vite + react-admin (FSD)
-├── nginx/nginx.conf     # Прод-роутинг: статика dist, прокси /api, /uploads, CSP
-├── secrets/             # Docker secret: admin_password (вне git)
-├── docs/OPERATIONS.md   # Подробная техдокументация
+├── nginx/nginx.conf     # Прод: статика dist + пререндер, прокси /api и /sitemap.xml,
+│                        #       CSP, кэш-заголовки, 301 со слэш-дублей
+├── secrets/             # Docker secrets: admin_password, jwt_secret, smtp_pass (вне git)
+├── docs/                # OPERATIONS.md, TECHNICAL-SPECIFICATION.md
 ├── docker-compose.yml   # postgres + backend + nginx + certbot (авто-renew TLS)
 └── deploy.sh / backup.sh / restore.sh
 ```
@@ -27,9 +30,9 @@ work/
 
 | Слой | Технологии |
 |------|------------|
-| Backend | Express 5, TypeScript (ESM), PostgreSQL (`pg`), JWT (httpOnly cookie), multer + file-type, nodemailer, helmet, express-rate-limit, express-validator, winston. Node 20. |
-| Frontend | React 18, Vite, react-router 6, TanStack Query, react-admin 5 + MUI, axios. Карта 2ГИС, Яндекс.Метрика. FSD. |
-| Инфра | docker-compose (postgres:16-alpine + backend + nginx), docker secret, тома `postgres_data` / `uploads`, GitHub Actions. |
+| Backend | Express 5, TypeScript (ESM), PostgreSQL (`pg`), JWT (httpOnly cookie, скользящая сессия ≤24 ч), multer + file-type, nodemailer, helmet, express-rate-limit, express-validator, winston. Node 20. |
+| Frontend | React 18, Vite, react-router 6, TanStack Query, react-admin 5 + MUI, axios. Карта 2ГИС, Яндекс.Метрика, БВИ. FSD. |
+| Инфра | docker-compose (postgres:16-alpine + backend + nginx + certbot), docker secrets, тома `postgres_data` / `uploads`, GitHub Actions. |
 
 ## Быстрый старт (локально)
 
@@ -54,17 +57,20 @@ cd mrdk-front && npm install && npm run dev
 docker compose build && docker compose up -d
 ```
 
-Прод бежит на **скомпилированном** коде — после правок пересобирай нужный образ (`build` + `up -d`); для `nginx.conf` достаточно `restart nginx`. На сервере — `./deploy.sh` (`git pull` + `build` + `up -d`).
+Прод бежит на **скомпилированном** коде — после правок пересобирай нужный образ (`build` + `up -d`); для `nginx.conf` достаточно `restart nginx`. На сервере — `./deploy.sh` (`git pull` + `build` + `up -d` + ожидание healthcheck).
 
-Полный рунбук (VPS, HTTPS/сертификат, грабли nginx-прокси, CSP) — в [docs/OPERATIONS.md](docs/OPERATIONS.md).
+Полный рунбук (VPS, HTTPS/сертификат, миграция секретов, грабли nginx, CSP) — в [docs/OPERATIONS.md](docs/OPERATIONS.md).
 
-## Переменные окружения (кратко)
+## Переменные окружения и секреты (кратко)
 
-- **Корневой `.env`** + **`secrets/admin_password`** — нужны везде, где поднимаешь стек (создаются вручную, вне git).
-- **`mrdk-front/.env.production`** — build-переменные фронта (`VITE_API_BASE_URL`, `VITE_YM_COUNTER_ID`); коммитится.
-- **`mrdk-back/.env`, `mrdk-front/.env`** — только для локального `npm run dev`.
+На сервере вручную создаются **четыре файла** (все вне git):
 
-Детали и таблица — в [docs/OPERATIONS.md](docs/OPERATIONS.md#переменные-окружения).
+- корневой **`.env`** — переменные compose: БД, CORS, SMTP (без пароля), админ-логин, `SITE_ORIGIN`;
+- **`secrets/admin_password`**, **`secrets/jwt_secret`**, **`secrets/smtp_pass`** — docker secrets.
+
+`mrdk-front/.env.production` (build-переменные `VITE_*`) коммитится и приезжает с git. `mrdk-back/.env` и `mrdk-front/.env` — только для локального `npm run dev`.
+
+Таблица и детали — в [docs/OPERATIONS.md](docs/OPERATIONS.md#переменные-окружения-и-секреты).
 
 ## Тесты
 

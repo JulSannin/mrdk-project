@@ -29,68 +29,72 @@ export function EventDetailPage() {
       : 'Событие Мариинского районного Дома культуры.',
   );
 
-  if (isPending) return (
-    <>
-      <article className={styles.section}>
-        <Skeleton height="400px" />
-        <Skeleton height="32px" width="60%" />
-        <Skeleton height="18px" width="30%" />
-        <Skeleton height="16px" />
-        <Skeleton height="16px" />
-        <Skeleton height="16px" width="80%" />
-      </article>
-      <ExternalLinkCards />
-      <VideoBlock />
-    </>
-  );
   if (isError) return <><ErrorMessage message="Не удалось загрузить событие" onRetry={() => refetch()} /><ExternalLinkCards /></>;
 
+  // Один макет на оба состояния (как на списковых страницах): меняется только
+  // содержимое <article>, обвязка не дублируется. key перезапускает fade-in.
   return (
     <>
-      <article className={`${styles.section} ${uiStyles.fadeIn}`}>
-        <button type="button" className={styles.back} onClick={() => navigate(-1)}>
-          ← Назад
-        </button>
-        <BviImg
-          className={styles.cover}
-          src={event.image_path ? `/${event.image_path}` : '/default.jpg'}
-          alt={event.title}
-        />
-        <h1>{event.title}</h1>
-        {event.event_date && (
-          <time className={styles.date}>{formatDate(event.event_date)}</time>
-        )}
-        <div className={styles.description}>
-          {event.description?.split('\n').map((line, i) => (
-            <p key={i}>{line}</p>
-          ))}
-        </div>
-        {event.images && event.images.length > 0 && (
-          <div className={styles.gallery}>
-            <h2 className={styles.galleryTitle}>Фотографии</h2>
-            <div className={styles.galleryGrid}>
-              {event.images.map((img) => (
-                <BviImg key={img.id} src={`/${img.image_path}`} alt={event.title} />
+      <article
+        key={isPending ? 'skeleton' : 'content'}
+        className={`${styles.section} ${isPending ? '' : uiStyles.fadeIn}`}
+      >
+        {isPending ? (
+          <>
+            <Skeleton height="400px" />
+            <Skeleton height="32px" width="60%" />
+            <Skeleton height="18px" width="30%" />
+            <Skeleton height="16px" />
+            <Skeleton height="16px" />
+            <Skeleton height="16px" width="80%" />
+          </>
+        ) : (
+          <>
+            <button type="button" className={styles.back} onClick={() => navigate(-1)}>
+              ← Назад
+            </button>
+            <BviImg
+              className={styles.cover}
+              src={event.image_path ? `/${event.image_path}` : '/default.jpg'}
+              alt={event.title}
+            />
+            <h1>{event.title}</h1>
+            {event.event_date && (
+              <time className={styles.date}>{formatDate(event.event_date)}</time>
+            )}
+            <div className={styles.description}>
+              {event.description?.split('\n').map((line, i) => (
+                <p key={i}>{line}</p>
               ))}
             </div>
-          </div>
-        )}
-        {event.videos && event.videos.length > 0 && (
-          <div>
-            <h2 className={styles.galleryTitle}>Видео</h2>
-            <div className={styles.videoGrid}>
-              {event.videos.map((vid) => (
-                <video
-                  key={vid.id}
-                  className={styles.video}
-                  src={`/${vid.video_path}`}
-                  controls
-                  preload="metadata"
-                  playsInline
-                />
-              ))}
-            </div>
-          </div>
+            {event.images && event.images.length > 0 && (
+              <div className={styles.gallery}>
+                <h2 className={styles.galleryTitle}>Фотографии</h2>
+                <div className={styles.galleryGrid}>
+                  {event.images.map((img) => (
+                    <BviImg key={img.id} src={`/${img.image_path}`} alt={event.title} />
+                  ))}
+                </div>
+              </div>
+            )}
+            {event.videos && event.videos.length > 0 && (
+              <div>
+                <h2 className={styles.galleryTitle}>Видео</h2>
+                <div className={styles.videoGrid}>
+                  {event.videos.map((vid) => (
+                    <video
+                      key={vid.id}
+                      className={styles.video}
+                      src={`/${vid.video_path}`}
+                      controls
+                      preload="metadata"
+                      playsInline
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
         )}
       </article>
       <ExternalLinkCards />

@@ -55,7 +55,6 @@ app.use(cookieParser());
 app.set('trust proxy', 1);
 
 app.use('/health', healthRouter);
-app.get('/sitemap.xml', getSitemap); // до лимитера — краулеры не троттлятся
 
 // Статика загрузок (только dev; в проде /uploads отдаёт nginx) — ДО лимитера,
 // иначе каждая картинка считается в rate-limit: при активных обновлениях дев
@@ -65,6 +64,9 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 app.use(generalLimiter);
+
+// Статический XML из константы (см. controllers/sitemap.ts) — лимитер ему не мешает.
+app.get('/sitemap.xml', getSitemap);
 
 app.use('/auth', authRouter);
 app.use('/events', eventsRouter);

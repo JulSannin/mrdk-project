@@ -1,7 +1,3 @@
-// Дату нормализуем через локальные методы Date — фиксируем TZ, чтобы
-// '...T..Z' не «уехал» на сутки в CI с другим часовым поясом.
-process.env.TZ = 'UTC';
-
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 
 vi.mock('../../shared/lib/apiClient', () => ({

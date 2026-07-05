@@ -12,8 +12,18 @@
 
 .tableWrapper {
   overflow-x: auto;
+  width: 100%;
   max-width: 1280px;
   font-size: 16px;
+}
+
+/* Скелетон на месте таблицы: та же ширина, что у .tableWrapper (composes),
+   поэтому при приходе данных блок не меняет габариты. */
+.tableSkeleton {
+  composes: tableWrapper;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .table {
@@ -21,17 +31,7 @@
   border-collapse: collapse;
 }
 
-.srOnly {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
+/* sr-only (.srOnly) — общий, в shared/ui/ui.module.css. */
 
 .th {
   border: 1px solid var(--color-gray);

@@ -24,8 +24,14 @@
       property="og:description"
       content="Афиша и фотоотчёты мероприятий, клубы и кружки, планы работы, документы, контакты."
     />
-    <meta property="og:url" content="https://nn-lance.ru/" />
-    <meta property="og:image" content="https://nn-lance.ru/favicon.svg" />
+    <!-- %SITE_ORIGIN% подставляется на сборке из siteMeta.ts (vite.config: injectSiteOrigin) -->
+    <meta property="og:url" content="%SITE_ORIGIN%/" />
+    <!-- og:image обязан быть растровым (PNG/JPG) и крупным: SVG соцсети отвергают.
+         Размеры указываем явно — скрейперы тогда не докачивают файл для проверки. -->
+    <meta property="og:image" content="%SITE_ORIGIN%/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
   </head>
   <body>
     <div id="root"></div>

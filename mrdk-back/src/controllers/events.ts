@@ -145,6 +145,8 @@ export async function addEventImages(req: Request, res: Response, next: NextFunc
       );
       inserted.push(r.rows[0]);
     }
+    // галерея — часть события: фиксируем изменение (иначе lastmod в sitemap устаревает)
+    await client.query('UPDATE events SET updated_at = NOW() WHERE id = $1', [req.params.id]);
     await client.query('COMMIT');
     res.status(201).json({ data: inserted });
   } catch (err) {
@@ -170,6 +172,7 @@ export async function deleteEventImage(req: Request, res: Response, next: NextFu
     if (result.rows.length === 0) {
       res.status(404).json({ error: { message: 'Не найдено', statusCode: 404 } }); return;
     }
+    await pool.query('UPDATE events SET updated_at = NOW() WHERE id = $1', [req.params.id]);
     const rec = result.rows[0];
     if (rec.image_path) {
       fs.promises.unlink(rec.image_path)
@@ -226,6 +229,8 @@ export async function addEventVideos(req: Request, res: Response, next: NextFunc
       );
       inserted.push(r.rows[0]);
     }
+    // видео — часть события: фиксируем изменение (иначе lastmod в sitemap устаревает)
+    await client.query('UPDATE events SET updated_at = NOW() WHERE id = $1', [req.params.id]);
     await client.query('COMMIT');
     res.status(201).json({ data: inserted });
   } catch (err) {
@@ -251,6 +256,7 @@ export async function deleteEventVideo(req: Request, res: Response, next: NextFu
     if (result.rows.length === 0) {
       res.status(404).json({ error: { message: 'Не найдено', statusCode: 404 } }); return;
     }
+    await pool.query('UPDATE events SET updated_at = NOW() WHERE id = $1', [req.params.id]);
     const rec = result.rows[0];
     if (rec.video_path) {
       fs.promises.unlink(rec.video_path)

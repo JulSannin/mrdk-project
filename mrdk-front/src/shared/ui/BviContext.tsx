@@ -70,7 +70,11 @@ export function BviProvider({ children }: { children: ReactNode }) {
       delete el.dataset.bviLetterSpacing;
       delete el.dataset.bviImages;
     }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    } catch {
+      // storage недоступен (приватный режим/политики) — режим работает без сохранения
+    }
   }, [settings]);
 
   const value: BviContextValue = {

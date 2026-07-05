@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ReactPaginate from '../../shared/lib/reactPaginate';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import type { ApiList, Reminder } from '../../entities/types';
 import apiClient from '../../shared/lib/apiClient';
 import uiStyles from '../../shared/ui/ui.module.css';
@@ -22,10 +22,13 @@ export function RemindersPage() {
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const prevFocusRef = useRef<HTMLElement | null>(null);
 
-  const { data, isPending, isError, refetch } = useQuery({
+  const { data, isPending, isPlaceholderData, isError, refetch } = useQuery({
     queryKey: ['reminders', page],
     queryFn: () =>
       apiClient.get<ApiList<Reminder>>('/reminders', { params: { page, limit: LIMIT } }).then((r) => r.data),
+    // при смене страницы прежние карточки остаются на экране (притушены — .updating),
+    // пагинатор не размонтируется; скелетон — только на первой загрузке (см. EventsPage)
+    placeholderData: keepPreviousData,
   });
 
   useEffect(() => {
@@ -61,9 +64,12 @@ export function RemindersPage() {
     <>
       <section className={styles.section}>
         <h1 className={styles.title}>Памятки</h1>
+        {/* key по первой карточке показанных данных — fade-in на смене содержимого,
+            а не в момент клика (см. комментарий в EventsPage) */}
         <ul
-          key={isPending ? 'skeleton' : `page-${page}`}
-          className={`${styles.grid} ${isPending ? '' : uiStyles.fadeIn}`}
+          key={isPending ? 'skeleton' : `d-${reminders[0]?.id ?? 'empty'}`}
+          className={`${styles.grid} ${isPending ? '' : uiStyles.fadeIn} ${isPlaceholderData ? uiStyles.updating : ''}`}
+          aria-busy={isPending || isPlaceholderData}
         >
           {isPending
             ? Array.from({ length: LIMIT }, (_, i) => (

@@ -6,6 +6,17 @@ if (process.env.NODE_ENV !== 'production') {
   dotenv.default.config();
 }
 
+// Docker secrets: X_FILE указывает на файл с секретом (/run/secrets/...). Разворачиваем
+// в process.env ДО проверки requiredEnv и до импорта модулей, читающих env на этапе
+// инициализации (mailer). Файл берётся, только если сам X не задан — dev с обычным
+// .env работает как раньше. (ADMIN_PASSWORD_FILE обрабатывается отдельно ниже.)
+for (const key of ['JWT_SECRET', 'SMTP_PASS']) {
+  const file = process.env[`${key}_FILE`];
+  if (file && !process.env[key]) {
+    process.env[key] = fs.readFileSync(file, 'utf8').trim();
+  }
+}
+
 const requiredEnv = ['DATABASE_URL', 'JWT_SECRET', 'ADMIN_LOGIN'];
 const missingEnv = requiredEnv.filter((key) => !process.env[key]);
 if (missingEnv.length > 0) {

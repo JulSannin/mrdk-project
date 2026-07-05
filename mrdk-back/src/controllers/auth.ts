@@ -22,8 +22,9 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
       return;
     }
     const user = result.rows[0];
+    // sess — момент логина: ограничивает скользящее продление сутками (middleware/auth.ts)
     const token = jwt.sign(
-      { userId: user.id, role: user.role },
+      { userId: user.id, role: user.role, sess: Math.floor(Date.now() / 1000) },
       process.env.JWT_SECRET as string,
       { expiresIn: '2h' }
     );

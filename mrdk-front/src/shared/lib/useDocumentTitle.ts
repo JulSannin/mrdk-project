@@ -1,13 +1,6 @@
 import { useEffect } from 'react';
 import { useMatches } from 'react-router-dom';
-import { SITE_NAME, SITE_DESCRIPTION } from '../config/siteMeta';
-
-export { SITE_NAME };
-
-// Запасное описание, если у роута не задано своё.
-const DEFAULT_DESCRIPTION = SITE_DESCRIPTION;
-
-const formatTitle = (page?: string | null) => (page ? `${page} — ${SITE_NAME}` : SITE_NAME);
+import { SITE_DESCRIPTION, formatTitle } from '../config/siteMeta';
 
 // CSR-SPA: title и <meta name="description"> меняем в ЖИВОМ DOM на клиенте.
 // ВАЖНО: «Просмотр исходного кода» (Ctrl+U) всегда показывает статичный index.html —
@@ -38,7 +31,7 @@ export function useRouteMeta() {
     const m = [...matches].reverse().find((x) => hasTitle(x.handle));
     if (!m) return; // событие/админка — выставляют мета сами
     const h = m.handle as RouteMetaHandle;
-    applyMeta(formatTitle(h.title), h.description ?? DEFAULT_DESCRIPTION);
+    applyMeta(formatTitle(h.title), h.description ?? SITE_DESCRIPTION);
   }, [matches]);
 }
 
