@@ -1,17 +1,29 @@
 #!/usr/bin/env bash
 #
-# Бэкап МРДК: дамп БД (postgres) + архив тома загрузок (work_uploads).
+# Бэкап МРДК: дамп БД (postgres) + архив тома загрузок.
 # Запуск: sudo ./backup.sh   (docker требует root/группы docker)
-# Cron:   30 3 * * * /mnt/HDD/projects/work/backup.sh >> /var/log/mrdk-backup.log 2>&1
+# Cron:   30 3 * * * /путь/к/клону/backup.sh >> /var/log/mrdk-backup.log 2>&1
 #
 set -euo pipefail
 
-PROJECT_DIR="/mnt/HDD/projects/work"     # где лежит docker-compose.yml
-BACKUP_DIR="/mnt/HDD/backups/mrdk"       # куда складывать (лучше — отдельный диск)
-UPLOADS_VOLUME="work_uploads"            # имя тома загрузок (docker volume ls)
+# Каталог проекта = каталог самого скрипта: работает на любой машине без правок.
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# Куда складывать (лучше — отдельный диск). Переопределяется окружением:
+#   BACKUP_DIR=/mnt/backup ./backup.sh
+BACKUP_DIR="${BACKUP_DIR:-/var/backups/mrdk}"
 KEEP_DAYS=14                             # сколько дней хранить
 
+# Имя тома docker compose строит из имени каталога проекта:
+# work/ -> work_uploads, mrdk-project/ -> mrdk-project_uploads.
+PROJECT_NAME="$(basename "$PROJECT_DIR" | tr '[:upper:]' '[:lower:]')"
+UPLOADS_VOLUME="${UPLOADS_VOLUME:-${PROJECT_NAME}_uploads}"
+
 cd "$PROJECT_DIR"
+
+# Страховка: docker run с несуществующим именем тома молча СОЗДАЛ бы его пустым,
+# и в архив уехала бы пустота. Бэкапим только существующий том.
+docker volume inspect "$UPLOADS_VOLUME" >/dev/null 2>&1 \
+  || { echo "!! том $UPLOADS_VOLUME не найден (см. docker volume ls) — бэкап прерван" >&2; exit 1; }
 mkdir -p "$BACKUP_DIR"
 chmod 700 "$BACKUP_DIR"                   # внутри — хеши паролей, прячем от чужих
 STAMP="$(date +%F_%H%M)"

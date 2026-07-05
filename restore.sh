@@ -11,9 +11,11 @@
 #
 set -euo pipefail
 
-PROJECT_DIR="/mnt/HDD/projects/work"
-BACKUP_DIR="/mnt/HDD/backups/mrdk"
-UPLOADS_VOLUME="work_uploads"
+# Каталог проекта = каталог самого скрипта; BACKUP_DIR и имя тома — как в backup.sh.
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BACKUP_DIR="${BACKUP_DIR:-/var/backups/mrdk}"
+PROJECT_NAME="$(basename "$PROJECT_DIR" | tr '[:upper:]' '[:lower:]')"
+UPLOADS_VOLUME="${UPLOADS_VOLUME:-${PROJECT_NAME}_uploads}"
 
 cd "$PROJECT_DIR"
 

@@ -11,7 +11,8 @@
 #
 set -euo pipefail
 
-PROJECT_DIR="/mnt/HDD/projects/work"   # на сервере поправить под свой путь к клону
+# Каталог проекта = каталог самого скрипта: работает на любой машине без правок.
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKUP_BEFORE=0                        # 1 = снять бэкап перед up (миграции накатятся на старте)
 
 cd "$PROJECT_DIR"

@@ -218,7 +218,7 @@ docker compose up -d
 
 **Деплой на сервере — [deploy.sh](../deploy.sh):** `git pull --ff-only` → `docker compose build` → `up -d`, ждёт healthcheck бэкенда, чистит висячие образы. Опция `BACKUP_BEFORE=1` снимает бэкап перед миграциями.
 ```bash
-./deploy.sh   # поправь PROJECT_DIR внутри под путь клона на сервере
+./deploy.sh   # путь клона определяет сам (по расположению скрипта), правки не нужны
 ```
 
 ### ⚠️ Прод работает на скомпилированном коде — пересобирай образы
@@ -318,7 +318,7 @@ Content-Security-Policy задаётся в **двух** местах; при д
 ## Бэкап и восстановление
 
 Скрипты в корне (под root — нужен доступ к docker):
-- **[backup.sh](../backup.sh)** — `pg_dump` + архив тома `work_uploads`, ротация 14 дней; для регулярности — cron. Offsite (`rsync`) закомментирован.
+- **[backup.sh](../backup.sh)** — `pg_dump` + архив тома загрузок, ротация 14 дней; для регулярности — cron. Имя тома (`<каталог-клона>_uploads`) и путь проекта определяет сам; существование тома проверяется (несуществующее имя docker создал бы пустым — бэкапилась бы пустота). Каталог назначения: `/var/backups/mrdk`, переопределяется `BACKUP_DIR=... ./backup.sh`. Offsite (`rsync`) закомментирован.
 - **[restore.sh](../restore.sh)** — `list` / `<STAMP>` / `db <STAMP>` / `uploads <STAMP>`. ⚠️ перезаписывает текущие данные (с подтверждением).
 
 ---
@@ -337,7 +337,7 @@ Content-Security-Policy задаётся в **двух** местах; при д
 
 ## Эксплуатация — на заметку
 
-- **Загрузки** пишутся в именованный том `work_uploads`. Бэкенд работает **не от root** (`USER node`, uid 1000 — [Dockerfile](../mrdk-back/Dockerfile)); свежий том наследует владельца `node`. ⚠️ Если том уже существует и был root-овым — один раз: `docker compose down && docker run --rm -v work_uploads:/data alpine chown -R 1000:1000 /data && docker compose up -d`.
+- **Загрузки** пишутся в именованный том `<каталог-клона>_uploads` (compose строит имя из каталога проекта: `work/` → `work_uploads`, `mrdk-project/` → `mrdk-project_uploads`). Бэкенд работает **не от root** (`USER node`, uid 1000 — [Dockerfile](../mrdk-back/Dockerfile)); свежий том наследует владельца `node`. ⚠️ Если том уже существует и был root-овым — один раз: `docker compose down && docker run --rm -v <том>:/data alpine chown -R 1000:1000 /data && docker compose up -d`.
 - **Порт Postgres** привязан к `127.0.0.1:5432:5432` (только локалхост) — наружу не торчит; бэкенд ходит в БД по внутренней docker-сети (`postgres:5432`). ⚠️ Смена биндинга требует **пересоздания** контейнера (`docker compose up -d postgres`), а не `restart`. Проверка снаружи: `nc -zv <домен> 5432` → должно быть `refused`. (Docker публикует порты в обход UFW, поэтому защищает именно биндинг на `127.0.0.1`, а не фаервол.)
 - **Имена файлов:** multer отдаёт `originalname` в latin1 — чинится через `decodeOriginalName` (кириллица сохраняется).
 - **Graceful shutdown** — по `SIGTERM`/`SIGINT` (`docker compose stop`) бэкенд закрывает HTTP-сервер и пул БД, с таймаутом-страховкой 10с (`server.ts`).
