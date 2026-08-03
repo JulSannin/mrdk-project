@@ -3,18 +3,16 @@ import fs from 'fs';
 import { validationResult } from 'express-validator';
 import pool from '../config/db.js';
 import logger from '../config/logger.js';
+import { parsePagination } from '../utils/parsePagination.js';
 
 export async function getReminders(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const page = Math.max(1, parseInt(String(req.query.page)) || 1);
-    const limit = Math.min(100, Math.max(1, parseInt(String(req.query.limit)) || 12));
-    const offset = (page - 1) * limit;
+    const { limit, offset } = parsePagination(req.query);
     const [rows, count] = await Promise.all([
       pool.query('SELECT id, title, image_path FROM reminders ORDER BY created_at DESC LIMIT $1 OFFSET $2', [limit, offset]),
       pool.query('SELECT COUNT(*) FROM reminders'),
     ]);
     const total = parseInt(count.rows[0].count);
-    res.set('X-Total-Count', String(total));
     res.json({ data: rows.rows, total });
   } catch (err) { next(err); }
 }
@@ -44,11 +42,17 @@ export async function createReminder(req: Request, res: Response, next: NextFunc
     res.status(400).json({ error: { message: 'Ошибка валидации', statusCode: 400, details: errors.array() } });
     return;
   }
+  // Памятка без картинки не имеет смысла: на сайте это карточка-изображение,
+  // которая по клику открывается во весь экран. Требуем файл так же, как
+  // документы и план работы (см. documents.ts / workplan.ts).
+  if (!req.file) {
+    res.status(400).json({ error: { message: 'Изображение обязательно', statusCode: 400 } }); return;
+  }
   try {
     const { title } = req.body as { title: string };
     const result = await pool.query(
       'INSERT INTO reminders (title, image_path) VALUES ($1, $2) RETURNING *',
-      [title, req.file?.path ?? null]
+      [title, req.file.path]
     );
     res.status(201).json({ data: result.rows[0] });
   } catch (err) {

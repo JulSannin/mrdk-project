@@ -5,18 +5,16 @@ import { validationResult } from 'express-validator';
 import pool from '../config/db.js';
 import logger from '../config/logger.js';
 import { decodeOriginalName } from '../utils/decodeOriginalName.js';
+import { parsePagination } from '../utils/parsePagination.js';
 
 export async function getDocuments(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const page = Math.max(1, parseInt(String(req.query.page)) || 1);
-    const limit = Math.min(100, Math.max(1, parseInt(String(req.query.limit)) || 12));
-    const offset = (page - 1) * limit;
+    const { limit, offset } = parsePagination(req.query);
     const [rows, count] = await Promise.all([
       pool.query('SELECT id, title, original_name FROM documents ORDER BY created_at ASC LIMIT $1 OFFSET $2', [limit, offset]),
       pool.query('SELECT COUNT(*) FROM documents'),
     ]);
     const total = parseInt(count.rows[0].count);
-    res.set('X-Total-Count', String(total));
     res.json({ data: rows.rows, total });
   } catch (err) { next(err); }
 }

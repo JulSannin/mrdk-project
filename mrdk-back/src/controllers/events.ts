@@ -4,12 +4,11 @@ import { validationResult } from 'express-validator';
 import pool from '../config/db.js';
 import logger from '../config/logger.js';
 import { buildOrderBy } from '../utils/buildOrderBy.js';
+import { parsePagination } from '../utils/parsePagination.js';
 
 export async function getEvents(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const page = Math.max(1, parseInt(String(req.query.page)) || 1);
-    const limit = Math.min(100, Math.max(1, parseInt(String(req.query.limit)) || 12));
-    const offset = (page - 1) * limit;
+    const { limit, offset } = parsePagination(req.query);
     // необязательный фильтр по году события (?year=2024); мусор игнорируем
     const yearRaw = parseInt(String(req.query.year));
     const year = Number.isInteger(yearRaw) && yearRaw >= 1970 && yearRaw <= 2100 ? yearRaw : null;
@@ -27,7 +26,6 @@ export async function getEvents(req: Request, res: Response, next: NextFunction)
       pool.query(`SELECT COUNT(*) FROM events ${where}`, year ? [year] : []),
     ]);
     const total = parseInt(count.rows[0].count);
-    res.set('X-Total-Count', String(total));
     res.json({ data: rows.rows, total });
   } catch (err) { next(err); }
 }
@@ -50,10 +48,14 @@ export async function getEvent(req: Request, res: Response, next: NextFunction):
     return;
   }
   try {
+    // Tie-break по id обязателен: пачку файлов одной загрузки вставляет одна
+    // транзакция, а NOW() в Postgres — transaction_timestamp(), то есть у всех
+    // строк такой пачки created_at совпадает. Без id порядок внутри загрузки
+    // отдан на откуп плану запроса и может поменяться между запросами.
     const [eventResult, imagesResult, videosResult] = await Promise.all([
       pool.query('SELECT id, title, description, image_path, event_date, created_at FROM events WHERE id = $1', [req.params.id]),
-      pool.query('SELECT id, event_id, image_path, created_at FROM event_images WHERE event_id = $1 ORDER BY created_at ASC', [req.params.id]),
-      pool.query('SELECT id, event_id, video_path, created_at FROM event_videos WHERE event_id = $1 ORDER BY created_at ASC', [req.params.id]),
+      pool.query('SELECT id, event_id, image_path, created_at FROM event_images WHERE event_id = $1 ORDER BY created_at ASC, id ASC', [req.params.id]),
+      pool.query('SELECT id, event_id, video_path, created_at FROM event_videos WHERE event_id = $1 ORDER BY created_at ASC, id ASC', [req.params.id]),
     ]);
     if (eventResult.rows.length === 0) {
       res.status(404).json({ error: { message: 'Не найдено', statusCode: 404 } }); return;
@@ -145,7 +147,7 @@ export async function addEventImages(req: Request, res: Response, next: NextFunc
       );
       inserted.push(r.rows[0]);
     }
-    // галерея — часть события: фиксируем изменение (иначе lastmod в sitemap устаревает)
+    // галерея — часть события: держим updated_at честным
     await client.query('UPDATE events SET updated_at = NOW() WHERE id = $1', [req.params.id]);
     await client.query('COMMIT');
     res.status(201).json({ data: inserted });
@@ -229,7 +231,7 @@ export async function addEventVideos(req: Request, res: Response, next: NextFunc
       );
       inserted.push(r.rows[0]);
     }
-    // видео — часть события: фиксируем изменение (иначе lastmod в sitemap устаревает)
+    // видео — часть события: держим updated_at честным
     await client.query('UPDATE events SET updated_at = NOW() WHERE id = $1', [req.params.id]);
     await client.query('COMMIT');
     res.status(201).json({ data: inserted });

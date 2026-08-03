@@ -5,19 +5,17 @@ import { validationResult } from 'express-validator';
 import pool from '../config/db.js';
 import logger from '../config/logger.js';
 import { decodeOriginalName } from '../utils/decodeOriginalName.js';
+import { parsePagination } from '../utils/parsePagination.js';
 
 export async function getWorkplan(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const page = Math.max(1, parseInt(String(req.query.page)) || 1);
-    const limit = Math.min(100, Math.max(1, parseInt(String(req.query.limit)) || 12));
-    const offset = (page - 1) * limit;
+    const { limit, offset } = parsePagination(req.query);
     const [rows, count] = await Promise.all([
       // год ↓, внутри года месяц ↓ (декабрь сверху), затем дата создания ↓; пустые уходят в конец
       pool.query('SELECT id, title, year, month, original_name FROM workplan ORDER BY year DESC NULLS LAST, month DESC NULLS LAST, created_at DESC LIMIT $1 OFFSET $2', [limit, offset]),
       pool.query('SELECT COUNT(*) FROM workplan'),
     ]);
     const total = parseInt(count.rows[0].count);
-    res.set('X-Total-Count', String(total));
     res.json({ data: rows.rows, total });
   } catch (err) { next(err); }
 }

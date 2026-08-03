@@ -10,7 +10,7 @@ vi.mock('../config/logger.js', () => ({
 }));
 
 import pool from '../config/db.js';
-import { getEvents, getEventYears, deleteEventMainImage } from './events.js';
+import { getEvents, getEventYears, getEvent, deleteEventMainImage } from './events.js';
 
 const query = pool.query as unknown as Mock;
 
@@ -24,7 +24,7 @@ function mockRes() {
 beforeEach(() => { query.mockReset(); });
 
 describe('getEvents', () => {
-  it('возвращает { data, total } и ставит X-Total-Count', async () => {
+  it('возвращает { data, total } — счётчик только в теле, без заголовков', async () => {
     const rows = [{ id: 1, title: 'A' }, { id: 2, title: 'B' }];
     query
       .mockResolvedValueOnce({ rows })                    // выборка строк
@@ -33,8 +33,10 @@ describe('getEvents', () => {
     const next = vi.fn();
     await getEvents({ query: {} } as unknown as Request, res, next);
     expect(next).not.toHaveBeenCalled();
-    expect(res.set).toHaveBeenCalledWith('X-Total-Count', '2');
     expect(res.json).toHaveBeenCalledWith({ data: rows, total: 2 });
+    // Счётчик живёт только в теле: заголовок с тем же числом был бы вторым
+    // источником правды, а фронт его не читает.
+    expect(res.set).not.toHaveBeenCalled();
   });
 
   it('фильтр по году сдвигает плейсхолдеры на $2/$3', async () => {
@@ -83,6 +85,34 @@ describe('getEventYears', () => {
     const res = mockRes();
     await getEventYears({} as Request, res, vi.fn());
     expect(res.json).toHaveBeenCalledWith({ data });
+  });
+});
+
+describe('getEvent', () => {
+  // Пачку файлов одной загрузки вставляет одна транзакция, а NOW() =
+  // transaction_timestamp() → created_at у всей пачки одинаковый. Без tie-break
+  // по id порядок галереи внутри загрузки недетерминирован.
+  it('сортирует галерею и видео с tie-break по id', async () => {
+    query
+      .mockResolvedValueOnce({ rows: [{ id: 7, title: 'A' }] }) // событие
+      .mockResolvedValueOnce({ rows: [] })                      // картинки
+      .mockResolvedValueOnce({ rows: [] });                     // видео
+    await getEvent({ params: { id: 7 } } as unknown as Request, mockRes(), vi.fn());
+    const [, imagesSql] = [query.mock.calls[0][0], query.mock.calls[1][0]];
+    expect(imagesSql).toContain('FROM event_images');
+    expect(imagesSql).toContain('ORDER BY created_at ASC, id ASC');
+    expect(query.mock.calls[2][0]).toContain('FROM event_videos');
+    expect(query.mock.calls[2][0]).toContain('ORDER BY created_at ASC, id ASC');
+  });
+
+  it('несуществующее событие → 404', async () => {
+    query
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [] });
+    const res = mockRes();
+    await getEvent({ params: { id: 999 } } as unknown as Request, res, vi.fn());
+    expect(res.status).toHaveBeenCalledWith(404);
   });
 });
 
