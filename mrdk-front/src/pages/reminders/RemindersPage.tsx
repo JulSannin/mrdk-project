@@ -105,7 +105,10 @@ export function RemindersPage() {
             aria-modal="true"
             aria-label={selected.title}
             className={styles.overlay}
-            onClick={() => setSelected(null)}
+            // Закрываем только по клику в саму подложку, а не по любому всплывшему:
+            // иначе дети обязаны глушить всплытие, а картинка в BVI-режиме (там
+            // <span> без обработчиков) этого не может.
+            onClick={(e) => { if (e.target === e.currentTarget) setSelected(null); }}
           >
             <button
               ref={closeBtnRef}
@@ -120,7 +123,6 @@ export function RemindersPage() {
               className={styles.popupImage}
               src={`/${selected.image_path}`}
               alt={selected.title}
-              onClick={(e) => e.stopPropagation()}
             />
           </div>
         )}

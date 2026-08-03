@@ -40,7 +40,8 @@ export interface Document {
 export interface Reminder {
   id: number;
   title: string;
-  image_path: string | null;
+  /** Не nullable: картинка обязательна при создании памятки (бэк отдаёт 400 без файла). */
+  image_path: string;
   created_at?: string;
 }
 

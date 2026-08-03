@@ -4,7 +4,10 @@
 //
 // Номер счётчика берётся из VITE_YM_COUNTER_ID. Если он не задан — метрика выключена
 // (ничего не грузится), поэтому в dev/без счётчика всё работает как обычно.
-// CSP бэка уже разрешает mc.yandex.ru (app.ts → scriptSrc/connectSrc/imgSrc).
+// Второе условие запуска — согласие на обработку ПД: до него useYandexMetrika
+// сюда вообще не заходит (см. shared/analytics/consent.ts).
+// Домены mc.yandex.ru разрешает CSP страницы, а он живёт в nginx/nginx.conf:
+// HTML отдаёт nginx, а не Express, и helmet из app.ts бьёт только по /api.
 
 type YmFunction = ((...args: unknown[]) => void) & { a?: unknown[]; l?: number };
 

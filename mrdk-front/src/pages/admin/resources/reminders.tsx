@@ -34,6 +34,9 @@ const ReminderForm = ({ create = false }: { create?: boolean }) => (
       source="image"
       label={create ? 'Изображение' : 'Новое изображение (пусто = не менять)'}
       accept={{ 'image/*': ['.jpg', '.jpeg', '.png', '.webp'] }}
+      // Обязательно только при создании: при редактировании пустое поле означает
+      // «оставить текущую картинку», и required не дал бы сменить одно название.
+      validate={create ? required() : undefined}
     >
       <ImageField source="src" title="title" />
     </ImageInput>
