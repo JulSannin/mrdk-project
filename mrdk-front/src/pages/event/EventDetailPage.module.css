@@ -44,7 +44,7 @@
 
 .back:hover {
   border-color: var(--color-orange);
-  color: var(--color-orange);
+  color: var(--color-orange-text);
 }
 
 .cover {

@@ -6,20 +6,21 @@ import { BviImg } from '../../shared/ui/BviImg';
 function ExternalLinkCards() {
   return (
     <div className={styles.block}>
-      <div className={styles.grid}>
+      <ul className={styles.grid}>
         {ListExternalLinkCards.map(({ image, link, title }) => (
-          <a
-            key={image}
-            href={link || undefined}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.card}
-            aria-label={title}
-          >
-            <BviImg className={styles.image} src={image} alt={title ?? ''} fetchPriority="high" width={300} height={150}/>
-          </a>
+          <li key={image}>
+            <a
+              href={link || undefined}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.card}
+              aria-label={title}
+            >
+              <BviImg className={styles.image} src={image} alt={title ?? ''} fetchPriority="high" width={300} height={150}/>
+            </a>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 }

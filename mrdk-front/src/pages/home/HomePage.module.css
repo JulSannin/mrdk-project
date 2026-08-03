@@ -14,8 +14,8 @@
   justify-content: space-between;
   gap: 16px;
   width: 100%;
-  max-width: 1200px;
-  padding: 0 40px;
+  padding: 0 20px;
+  max-width: 980px;
 }
 
 .allLink {
@@ -50,7 +50,7 @@
 
 @media (min-width: 620px)  { .grid { grid-template-columns: repeat(2, minmax(0, 300px)); } }
 @media (min-width: 940px)  { .grid { grid-template-columns: repeat(3, minmax(0, 300px)); } }
-@media (min-width: 1280px) { .grid { grid-template-columns: repeat(3, minmax(0, 300px)); } }
+@media (min-width: 1280px) { .grid { grid-template-columns: repeat(4, minmax(0, 300px)); } }
 @media (min-width: 1660px) { .grid { grid-template-columns: repeat(4, minmax(0, 400px)); } }
 
 @media (max-width: 600px) {

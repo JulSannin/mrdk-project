@@ -95,6 +95,7 @@
 
 /* ссылка в бургер-меню */
 .burger__navlink {
+    display: block;
     font-weight: 500;
     font-size: 18px;
     color: var(--color-black-g);
@@ -114,7 +115,18 @@
 }
 
 .burger__socialmedia {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: none;
+}
+
+.burger__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 @media (min-width: 1280px) {

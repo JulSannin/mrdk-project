@@ -60,7 +60,7 @@ export function EventDetailPage() {
             />
             <h1>{event.title}</h1>
             {event.event_date && (
-              <time className={styles.date}>{formatDate(event.event_date)}</time>
+              <time className={styles.date} dateTime={event.event_date}>{formatDate(event.event_date)}</time>
             )}
             <div className={styles.description}>
               {event.description?.split('\n').map((line, i) => (

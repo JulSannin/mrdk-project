@@ -6,13 +6,14 @@ import styles from './Header.module.css';
 function NavBar() {
     
     return (
-        <nav className={styles.header__nav} aria-label='Основная навигация'>
-            {headerLinks.map(link => (
-                <NavLinks
-                key={link.type === 'internal' ? link.path : link.href}
-                link={link}
-                />
-            ))}
+        <nav className={styles.header__nav_wrap} aria-label='Основная навигация'>
+            <ul className={styles.header__nav}>
+                {headerLinks.map(link => (
+                    <li key={link.type === 'internal' ? link.path : link.href}>
+                        <NavLinks link={link} />
+                    </li>
+                ))}
+            </ul>
         </nav>
     );
 }

@@ -40,7 +40,7 @@ export function LoginPage() {
     };
 
     return (
-        <div className={styles.page}>
+        <main className={styles.page}>
             <form onSubmit={handleSubmit} noValidate className={styles.card}>
                 <h1 className={styles.title}>Вход в админ-панель</h1>
 
@@ -75,6 +75,6 @@ export function LoginPage() {
 
                 {formError && <p id="login-error" className={styles.error} role="alert">{formError}</p>}
             </form>
-        </div>
+        </main>
     );
 }

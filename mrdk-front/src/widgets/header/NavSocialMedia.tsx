@@ -4,20 +4,21 @@ import styles from './Header.module.css';
 
 function NavSocialMedia() {
     return (
-        <div className={styles.header__socialmedia}>
+        <ul className={styles.header__socialmedia}>
             {socialLinks.map(link => (
-                <a
-                    className={styles.header__socialmedia_link}
-                    key={link.href}
-                    href={link.href}
-                    target={link.target}
-                    rel={link.rel}
-                    aria-label={link.ariaLabel}
-                >
-                    <BviImg src={link.icon} alt={link.label} />
-                </a>
+                <li key={link.href}>
+                    <a
+                        className={styles.header__socialmedia_link}
+                        href={link.href}
+                        target={link.target}
+                        rel={link.rel}
+                        aria-label={link.ariaLabel}
+                    >
+                        <BviImg src={link.icon} alt={link.label} />
+                    </a>
+                </li>
             ))}
-        </div>
+        </ul>
     );
 }
 

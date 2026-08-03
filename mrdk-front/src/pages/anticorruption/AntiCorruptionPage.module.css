@@ -30,7 +30,7 @@
 
 .link:hover,
 .link:focus-visible {
-  color: var(--color-orange);
+  color: var(--color-orange-text);
   text-decoration: underline;
 }
 

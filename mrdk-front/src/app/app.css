@@ -33,11 +33,18 @@
 :root {
   --color-yellow: #fdca40;
   --color-orange: #ff8c00;
+  /* Тёмный оранжевый для ТЕКСТА на светлом фоне: яркий #ff8c00 как текст на
+     белом даёт лишь 2.33:1 (не проходит WCAG AA). Этот — 5.34:1. Сам
+     --color-orange оставляем для рамок/теней/фона (там контраст не нужен) и
+     для оранжевого текста на тёмном футере (#ff8c00 на графите = 5.06:1). */
+  --color-orange-text: #a85400;
   --color-black: #000000;
   --color-black-g: #31393c;
   --color-gray: #C0C0C0;
   --color-white: #ffffff;
-  --color-blue: #2176ff;
+  /* было #2176ff — ссылки и белый текст на синих бейджах/кнопках давали 4.12:1
+     (ниже нормы 4.5). #1a5fd0 = 5.85:1 и совпадает с прежним цветом наведения. */
+  --color-blue: #1a5fd0;
 }
 
 * {
@@ -148,6 +155,11 @@ html[data-bvi='on'] .topbar { background-color: var(--bvi-bg) !important; }
 html[data-bvi='on'] header {
   background-color: var(--bvi-bg) !important;
   border-bottom: 2px solid var(--bvi-fg);
+}
+/* Футер в BVI получает фон схемы через общий transparent (сливается с body) —
+   отделяем его линией сверху, зеркально border-bottom у шапки. */
+html[data-bvi='on'] footer {
+  border-top: 2px solid var(--bvi-fg);
 }
 html[data-bvi='on'] .bvi-panel {
   /* Фиксированная палитра панели управления — переопределяем переменные локально,

@@ -38,9 +38,9 @@ export function ClubsPage() {
               <caption className={uiStyles.srOnly}>Список клубов и руководителей</caption>
               <thead>
                 <tr>
-                  <th className={`${styles.th} ${styles.numCol}`}>№</th>
-                  <th className={styles.th}>Название</th>
-                  <th className={styles.th}>Руководитель</th>
+                  <th scope="col" className={`${styles.th} ${styles.numCol}`}>№</th>
+                  <th scope="col" className={styles.th}>Название</th>
+                  <th scope="col" className={styles.th}>Руководитель</th>
                 </tr>
               </thead>
               <tbody>

@@ -27,9 +27,13 @@ function EventCard({ event, priority = false }: { event: Event; priority?: boole
             fetchPriority={priority ? 'high' : undefined}
           />
         </div>
-        <time className={styles['event-card__date']}>
-          {formatDate(event.event_date)}
-        </time>
+        {event.event_date ? (
+          <time className={styles['event-card__date']} dateTime={event.event_date}>
+            {formatDate(event.event_date)}
+          </time>
+        ) : (
+          <span className={styles['event-card__date']}>—</span>
+        )}
         <h2 className={styles['event-card__title']}>{event.title}</h2>
         <p className={styles['event-card__description']}>
           {truncate(event.description, MAX_DESCRIPTION_LENGTH)}

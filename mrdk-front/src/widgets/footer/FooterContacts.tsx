@@ -24,23 +24,32 @@ function FooterContacts() {
                 {contactsLink?.label}
             </NavLink>
             <hr className={styles.footer__contacts_hr} />
-            <p className={styles.footer__contacts_info}>
-                <span className={styles.footer__contacts_info_label}>E-mail: </span>
-                <a href="mailto:rdk-pristan@mail.ru" className={styles['footer__contacts_info_mail-link']}>
-                    rdk-pristan@mail.ru
-                </a>
-                <br />
-                <span className={styles.footer__contacts_info_label}>Адрес</span>: Кемеровская
-                область, Мариинский район, д.2-Пристань, ул.Весенняя, 13
-                <br />
-                <span className={styles.footer__contacts_info_label}>Телефон</span>:
-                <a 
-                    href="tel:+79230318935" 
-                    className={styles['footer__contacts_info_tel-link']}
-                >
-                    +7-923-031-89-35
-                </a> , 37-1-36
-            </p>
+            <address className={styles.footer__contacts_info}>
+                <dl className={styles.footer__contacts_dl}>
+                    <div className={styles.footer__contacts_dl_row}>
+                        <dt className={styles.footer__contacts_info_label}>E-mail:</dt>
+                        <dd className={styles.footer__contacts_dd}>
+                            <a href="mailto:rdk-pristan@mail.ru" className={styles['footer__contacts_info_mail-link']}>
+                                rdk-pristan@mail.ru
+                            </a>
+                        </dd>
+                    </div>
+                    <div className={styles.footer__contacts_dl_row}>
+                        <dt className={styles.footer__contacts_info_label}>Адрес:</dt>
+                        <dd className={styles.footer__contacts_dd}>
+                            Кемеровская область, Мариинский район, д. 2-Пристань, ул. Весенняя, 13
+                        </dd>
+                    </div>
+                    <div className={styles.footer__contacts_dl_row}>
+                        <dt className={styles.footer__contacts_info_label}>Телефон:</dt>
+                        <dd className={styles.footer__contacts_dd}>
+                            <a href="tel:+79230318935" className={styles['footer__contacts_info_tel-link']}>
+                                +7-923-031-89-35
+                            </a>, 37-1-36
+                        </dd>
+                    </div>
+                </dl>
+            </address>
         </div>
     )
 }

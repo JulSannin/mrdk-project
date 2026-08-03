@@ -22,5 +22,5 @@
 .fallback:hover,
 .fallback:focus-visible {
   border-color: var(--color-orange);
-  color: var(--color-orange);
+  color: var(--color-orange-text);
 }

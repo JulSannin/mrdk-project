@@ -45,7 +45,7 @@
 
 .link:hover,
 .link:focus-visible {
-  color: var(--color-orange);
+  color: var(--color-orange-text);
   text-decoration: underline;
 }
 
@@ -138,16 +138,16 @@
   border: none;
   border-radius: 8px;
   background-color: var(--color-orange);
-  color: var(--color-white);
+  color: var(--color-black-g);
   font-family: inherit;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.15s ease, transform 0.15s ease;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
 }
 
 .submit:hover:not(:disabled) {
-  background-color: #e67e00;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
   transform: translateY(-2px);
 }
 

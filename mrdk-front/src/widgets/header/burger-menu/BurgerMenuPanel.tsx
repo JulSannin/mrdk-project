@@ -29,15 +29,13 @@ function BurgerMenuPanel({
                 ].join(' ')}
             >
                 <hr className={styles.burger__panel_hr}/>
-                {headerLinks.map((link) => (
-                    <BurgerMenuLinks
-                        key={link.type === 'internal' ? link.path : link.href}
-                        link={link}
-                        onClick={onClose}
-                    />
-                )
-
-                )}
+                <ul className={styles.burger__list}>
+                    {headerLinks.map((link) => (
+                        <li key={link.type === 'internal' ? link.path : link.href}>
+                            <BurgerMenuLinks link={link} onClick={onClose} />
+                        </li>
+                    ))}
+                </ul>
                 <BurgerMenuSocialMedia />
                 <hr className="bvi-burger-end" />
             </nav>
