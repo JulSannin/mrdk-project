@@ -2,6 +2,12 @@ FROM node:24-alpine AS builder
 
 WORKDIR /app
 
+# Прод-сервер — 1 ядро / 1 ГБ. Потолок кучи: при нехватке памяти получаем
+# ошибку сборки вместо свопа и зависшего сервера. Замерено: tsc укладывается
+# (пик RSS ~420 МБ). Сборки сервисов deploy.sh запускает по очереди — вместе
+# два тулчейна в 1 ГБ не помещаются.
+ENV NODE_OPTIONS=--max-old-space-size=384
+
 COPY package*.json tsconfig.json ./
 RUN npm ci
 
