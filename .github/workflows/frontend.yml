@@ -21,7 +21,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24 # совпадает с прод-образом (mrdk-front/Dockerfile)
           cache: npm
           cache-dependency-path: mrdk-front/package-lock.json
 
@@ -35,3 +35,9 @@ jobs:
 
       - name: Tests
         run: npm test
+
+      # Прод-сборка в CI обязательна: в ней живёт гард replaceOrThrow
+      # (vite.config.ts), который валит сборку при дрейфе разметки меты в
+      # index.html. Без этого шага поломка всплывала бы только на деплое.
+      - name: Build
+        run: npm run build

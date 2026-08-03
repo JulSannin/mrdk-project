@@ -26,6 +26,33 @@ confirm() {
   [[ "$a" =~ ^[Yy]$ ]] || { echo "Отмена."; exit 1; }
 }
 
+BACKEND_STOPPED=0
+
+# Бэкенд ОБЯЗАН быть остановлен на время заливки дампа: дамп снят с
+# --clean --if-exists, то есть начинается с DROP TABLE, а живой пул соединений
+# держит блокировки. Конфликт блокировок вместе с ON_ERROR_STOP=1 оборвал бы
+# восстановление на середине — полубитая БД ровно в аварийном сценарии.
+stop_backend() {
+  echo ">> Останавливаю бэкенд на время восстановления БД"
+  docker compose stop backend
+  BACKEND_STOPPED=1
+}
+
+start_backend() {
+  echo ">> Поднимаю бэкенд"
+  docker compose start backend
+  BACKEND_STOPPED=0
+}
+
+# Если восстановление упало на середине (set -e), бэкенд не должен остаться
+# лежать — сайт был бы недоступен до ручного вмешательства.
+on_exit() {
+  [ "$BACKEND_STOPPED" = "1" ] || return 0
+  echo "!! Восстановление прервано — поднимаю бэкенд обратно" >&2
+  docker compose start backend || true
+}
+trap on_exit EXIT
+
 restore_db() {
   local f="$BACKUP_DIR/db-$1.sql.gz"
   [ -f "$f" ] || { echo "Нет файла: $f"; exit 1; }
@@ -51,20 +78,25 @@ case "$1" in
     ;;
   db)
     [ $# -eq 2 ] || usage
-    confirm; restore_db "$2"
-    docker compose restart backend
+    confirm
+    stop_backend
+    restore_db "$2"
+    start_backend
     ;;
   uploads)
+    # Загрузки в проде раздаёт nginx, БД не трогаем — останавливать бэкенд незачем.
     [ $# -eq 2 ] || usage
     confirm; restore_uploads "$2"
     docker compose restart backend nginx
     ;;
   *)
     confirm
+    stop_backend
     restore_db "$1"
     restore_uploads "$1"
-    echo ">> Перезапускаю сервисы"
-    docker compose restart backend nginx
+    start_backend
+    echo ">> Перезапускаю nginx"
+    docker compose restart nginx
     ;;
 esac
 

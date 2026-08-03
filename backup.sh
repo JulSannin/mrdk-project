@@ -30,15 +30,27 @@ STAMP="$(date +%F_%H%M)"
 
 echo "[$(date '+%F %T')] backup start -> $BACKUP_DIR (stamp $STAMP)"
 
+# Пишем во временные файлы и переименовываем ТОЛЬКО по успеху. Иначе упавший
+# pg_dump (pipefail корректно валит скрипт) оставлял бы на диске обрезанный
+# архив под обычным именем — по нему не отличить битый бэкап от годного, и
+# именно его можно было бы выбрать при восстановлении. Имена скрытые, поэтому
+# ротация ниже (db-*/uploads-*) их не подхватывает.
+DB_PART=".db-$STAMP.sql.gz.part"
+UP_PART=".uploads-$STAMP.tar.gz.part"
+cleanup_partial() { rm -f "$BACKUP_DIR/$DB_PART" "$BACKUP_DIR/$UP_PART"; }
+trap cleanup_partial EXIT
+
 # 1) Дамп БД (pg_dump из самого контейнера — версия совпадёт с сервером)
 docker compose exec -T postgres pg_dump -U mrdk --clean --if-exists mrdk \
-  | gzip > "$BACKUP_DIR/db-$STAMP.sql.gz"
+  | gzip > "$BACKUP_DIR/$DB_PART"
+mv "$BACKUP_DIR/$DB_PART" "$BACKUP_DIR/db-$STAMP.sql.gz"
 
 # 2) Архив тома загрузок
 docker run --rm \
   -v "${UPLOADS_VOLUME}:/src:ro" \
   -v "${BACKUP_DIR}:/dst" \
-  alpine tar czf "/dst/uploads-$STAMP.tar.gz" -C /src .
+  alpine tar czf "/dst/$UP_PART" -C /src .
+mv "$BACKUP_DIR/$UP_PART" "$BACKUP_DIR/uploads-$STAMP.tar.gz"
 
 # 3) Ротация — удалить копии старше KEEP_DAYS
 find "$BACKUP_DIR" -name 'db-*.sql.gz'      -mtime +"$KEEP_DAYS" -delete

@@ -69,7 +69,7 @@
 **Слои:** `routes` (пути + middleware) → `validators` (express-validator) → `controllers` (логика + SQL) → `config/db` (пул `pg`). Поперечно: `middleware` (auth/requireAdmin/validateId/verifyFileType/rateLimiter), `config/multer`, `config/mailer`, `config/migrate`.
 
 **Формат ответов:**
-- успех: `{ "data": ... }`, у списков `{ "data": [...], "total": N }` + заголовок `X-Total-Count`; у части действий — `{ "success": true }`;
+- успех: `{ "data": ... }`, у списков `{ "data": [...], "total": N }` (счётчик только в теле — заголовка `X-Total-Count` больше нет); у части действий — `{ "success": true }`;
 - ошибка: `{ "error": { "message", "statusCode", "details"? } }`. Для 5xx наружу — обобщённое «Внутренняя ошибка сервера», стек в лог.
 
 **Загрузка файлов** (две ступени): `multer` сохраняет на диск со случайным именем, фильтрует по заявленному MIME и лимиту (изображения 5 МБ, документы 20 МБ, видео 200 МБ) → `verifyFileType` дочитывает **сигнатуру** (magic bytes), сверяет реальный тип, при несовпадении удаляет файл и отдаёт 400, нормализует расширение. Типы: изображения `jpeg/png/webp`, документы `doc/docx/pdf`, видео `mp4/webm/quicktime`.
@@ -81,6 +81,8 @@
 ## API
 
 Базовый префикс в браузере — `/api` (nginx срезает перед бэкендом).
+
+Пагинация списков разбирается общим [parsePagination](../mrdk-back/src/utils/parsePagination.ts): `limit` ≤ 100 (дефолт 12), `page` ≤ 1 000 000. Потолок `page` обязателен — без него offset уходит в экспоненциальную запись, которую Postgres не принимает для `bigint`, и публичный эндпоинт отвечает 500.
 
 ### Публичные (без авторизации)
 
@@ -109,7 +111,7 @@
 |--------|----------|
 | **events** | `POST /events` (фото необязательно — без него `image_path=NULL`, на сайте заглушка); `POST /:id/images` (≤10), `DELETE /:id/images/:imageId`; `POST /:id/videos` (≤10), `DELETE /:id/videos/:videoId`; `DELETE /:id/image` (сброс основного фото в `NULL`); `PATCH /:id`; `DELETE /:id` |
 | **documents / workplan** | `POST` · `PATCH /:id` · `DELETE /:id` (с файлом; у workplan поля `year`/`month`) |
-| **reminders** | `POST` · `PATCH /:id` · `DELETE /:id` (с изображением) |
+| **reminders** | `POST` (изображение **обязательно**) · `PATCH /:id` (пусто = не менять) · `DELETE /:id` |
 | **clubs** | `POST` · `PATCH /:id` · `DELETE /:id` |
 
 При удалении записей с файлами связанные файлы на диске тоже удаляются; галерея событий чистится каскадом в БД. Любая мутация медиа события (добавление/удаление фото и видео, сброс главного фото, PATCH) обновляет `events.updated_at`.
@@ -127,7 +129,7 @@
 | `event_images` / `event_videos` | галерея | `event_id → events(id) ON DELETE CASCADE`, `*_path` |
 | `workplan` | планы работы | `title`, `document_path`, `original_name`, `year`, `month` |
 | `documents` | документы | `title`, `document_path`, `original_name` |
-| `reminders` | памятки | `title`, `image_path` |
+| `reminders` | памятки | `title`, `image_path` (**NOT NULL** — памятка без картинки не имеет смысла) |
 | `clubs` | клубы/секции | `name`, `leader` |
 | `schema_migrations` | учёт миграций | `filename` (PK) |
 
@@ -138,7 +140,7 @@
 ## Frontend
 
 **Архитектура — Feature-Sliced Design**, слои в `src/`:
-- `app/` — корневой layout ([root.tsx](../mrdk-front/src/app/root.tsx)) и роутер ([routes.tsx](../mrdk-front/src/app/routes.tsx)); Header/Footer прячутся на `/login` и `/admin`; смена маршрута → скролл наверх + фокус в `<main>`; Метрика трекает SPA-переходы;
+- `app/` — корневой layout ([root.tsx](../mrdk-front/src/app/root.tsx)) и роутер ([routes.tsx](../mrdk-front/src/app/routes.tsx)); Header/Footer прячутся на `/login` и `/admin`; смена маршрута → скролл наверх + фокус в `<main>`; Метрика трекает SPA-переходы, но только после согласия на обработку ПД ([consent.ts](../mrdk-front/src/shared/analytics/consent.ts)) — до нажатия «Принять» скрипт счётчика не подключается вовсе;
 - `pages/` — страницы сайта и админка; `widgets/` — header/footer/блоки; `entities/` — карточки и типы; `shared/` — `apiClient` (axios, `withCredentials`), `queryClient`, `config/siteMeta.ts` (**единый источник SEO-меты и домена**), помощники, загрузчик 2ГИС, аналитика, ui (Skeleton/ErrorMessage/BVI-контексты, общие `srOnly`/скелетоны/fade-in в `ui.module.css`).
 
 **Маршруты:** `/`, `/events`, `/events/:id`, `/clubs`, `/workplan`, `/documents`, `/reminders`, `/anticorruption`, `/contacts`, `/login`, `/admin/*`, `*`. Админка и логин — ленивые чанки. У всех маршрутов, кроме `/events/:id`, есть `handle` с метой (title/description); событие ставит мету само из данных.
@@ -318,8 +320,8 @@ Content-Security-Policy задаётся в **двух** местах; при д
 ## Бэкап и восстановление
 
 Скрипты в корне (под root — нужен доступ к docker):
-- **[backup.sh](../backup.sh)** — `pg_dump` + архив тома загрузок, ротация 14 дней; для регулярности — cron. Имя тома (`<каталог-клона>_uploads`) и путь проекта определяет сам; существование тома проверяется (несуществующее имя docker создал бы пустым — бэкапилась бы пустота). Каталог назначения: `/var/backups/mrdk`, переопределяется `BACKUP_DIR=... ./backup.sh`. Offsite (`rsync`) закомментирован.
-- **[restore.sh](../restore.sh)** — `list` / `<STAMP>` / `db <STAMP>` / `uploads <STAMP>`. ⚠️ перезаписывает текущие данные (с подтверждением).
+- **[backup.sh](../backup.sh)** — `pg_dump` + архив тома загрузок, ротация 14 дней; для регулярности — cron. Имя тома (`<каталог-клона>_uploads`) и путь проекта определяет сам; существование тома проверяется (несуществующее имя docker создал бы пустым — бэкапилась бы пустота). Пишет во временные `.part`-файлы и переименовывает только по успеху — иначе упавший `pg_dump` оставил бы обрезанный архив под обычным именем, неотличимый от годного. Каталог назначения: `/var/backups/mrdk`, переопределяется `BACKUP_DIR=... ./backup.sh`. Offsite (`rsync`) закомментирован.
+- **[restore.sh](../restore.sh)** — `list` / `<STAMP>` / `db <STAMP>` / `uploads <STAMP>`. ⚠️ перезаписывает текущие данные (с подтверждением). На время заливки дампа **останавливает бэкенд**: дамп снят с `--clean --if-exists`, то есть начинается с `DROP TABLE`, а живой пул соединений даёт конфликт блокировок — вместе с `ON_ERROR_STOP=1` это оборвало бы восстановление на середине. Если восстановление упало, бэкенд поднимается обратно (trap). Ветка `uploads` бэкенд не трогает — БД там не участвует.
 
 ---
 
@@ -330,7 +332,7 @@ Content-Security-Policy задаётся в **двух** местах; при д
 - **Frontend** (`cd mrdk-front && npm test`): `dataProvider`.
 - Тест-файлы (`*.test.ts`) исключены из прод-сборки (`exclude` в [tsconfig](../mrdk-back/tsconfig.json)).
 
-**CI — GitHub Actions** в корне: [backend.yml](../.github/workflows/backend.yml) и [frontend.yml](../.github/workflows/frontend.yml). На push в `main` и на PR: `npm ci → lint → typecheck → test` (Node 20), `paths`-фильтр по своей папке.
+**CI — GitHub Actions** в корне: [backend.yml](../.github/workflows/backend.yml) и [frontend.yml](../.github/workflows/frontend.yml). На push в `main` и на PR: `npm ci → lint → typecheck → test` (фронт — плюс `build`, там гард пререндера), Node 24, `paths`-фильтр по своей папке; backend-workflow дополнительно триггерится на `mrdk-front/src/shared/config/siteMeta.ts` — его сверяет sitemap.test.ts.
 > GitHub Actions читает workflow **только из корневого** `.github/workflows`.
 
 ---

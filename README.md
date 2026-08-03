@@ -8,7 +8,7 @@
 
 ## Что это
 
-- **Публичный сайт ДК:** события с фотогалереями/видео и фильтром по годам, клубы и секции, планы работы, документы, памятки, противодействие коррупции, контакты с картой 2ГИС и формой обратной связи. Режим для слабовидящих (БВИ), Яндекс.Метрика, SEO-пререндер разделов + sitemap.
+- **Публичный сайт ДК:** события с фотогалереями/видео и фильтром по годам, клубы и секции, планы работы, документы, памятки, противодействие коррупции, контакты с картой 2ГИС и формой обратной связи. Режим для слабовидящих (БВИ), Яндекс.Метрика (только после согласия на обработку ПД), SEO-пререндер разделов + sitemap.
 - **Админ-панель** (`/admin`, react-admin): CRUD по событиям, планам работы, документам, памяткам, клубам; управление медиа событий.
 
 ## Структура
@@ -30,13 +30,13 @@ work/
 
 | Слой | Технологии |
 |------|------------|
-| Backend | Express 5, TypeScript (ESM), PostgreSQL (`pg`), JWT (httpOnly cookie, скользящая сессия ≤24 ч), multer + file-type, nodemailer, helmet, express-rate-limit, express-validator, winston. Node 20. |
+| Backend | Express 5, TypeScript (ESM), PostgreSQL (`pg`), JWT (httpOnly cookie, скользящая сессия ≤24 ч), multer + file-type, nodemailer, helmet, express-rate-limit, express-validator, winston. Node 24. |
 | Frontend | React 18, Vite, react-router 6, TanStack Query, react-admin 5 + MUI, axios. Карта 2ГИС, Яндекс.Метрика, БВИ. FSD. |
 | Инфра | docker-compose (postgres:16-alpine + backend + nginx + certbot), docker secrets, тома `postgres_data` / `uploads`, GitHub Actions. |
 
 ## Быстрый старт (локально)
 
-Нужны Node 20+ и Docker.
+Нужны Node 24+ и Docker.
 
 ```bash
 # 1. БД

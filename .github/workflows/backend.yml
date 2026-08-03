@@ -3,11 +3,20 @@ name: backend CI
 # Монорепо: GitHub Actions читает workflow только из КОРНЕВОГО .github/workflows.
 # Этот job гоняется только при изменениях в mrdk-back/.
 on:
+  # siteMeta.ts фронта — тоже триггер: sitemap.test.ts сверяет с ним STATIC_PATHS,
+  # и без этого пути тест, написанный РОВНО против кросс-проектного дрейфа, не
+  # запускался в главном направлении (фронт добавил раздел → sitemap не обновлён).
   push:
     branches: [main]
-    paths: ['mrdk-back/**', '.github/workflows/backend.yml']
+    paths:
+      - 'mrdk-back/**'
+      - 'mrdk-front/src/shared/config/siteMeta.ts'
+      - '.github/workflows/backend.yml'
   pull_request:
-    paths: ['mrdk-back/**', '.github/workflows/backend.yml']
+    paths:
+      - 'mrdk-back/**'
+      - 'mrdk-front/src/shared/config/siteMeta.ts'
+      - '.github/workflows/backend.yml'
 
 defaults:
   run:
@@ -21,7 +30,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20 # совпадает с прод-образом (mrdk-back/Dockerfile)
+          node-version: 24 # совпадает с прод-образом (mrdk-back/Dockerfile)
           cache: npm
           cache-dependency-path: mrdk-back/package-lock.json
 
