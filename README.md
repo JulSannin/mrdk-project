@@ -1,10 +1,6 @@
 # МРДК — сайт районного Дома культуры
 
-Монорепозиторий: публичный сайт + админ-панель + REST API + деплой-обвязка (Docker, nginx, CI, бэкапы). Клонируешь на сервер → создаёшь `.env` и секреты → `docker compose up` → работает.
-
-📖 Документация:
-- **[docs/OPERATIONS.md](docs/OPERATIONS.md)** — эксплуатация: архитектура, API, переменные и секреты, деплой, HTTPS, CSP, кэширование, SEO-обвязка, бэкапы, грабли.
-- **[docs/TECHNICAL-SPECIFICATION.md](docs/TECHNICAL-SPECIFICATION.md)** — техническое задание (требования, роли, структура данных, API-контракт).
+Монорепозиторий: публичный сайт + админ-панель + REST API + деплой-обвязка (Docker, nginx, CI, бэкапы). Клонируешь на сервер → создаёшь `.env` и секреты → выпускаешь TLS-сертификат → `./deploy.sh` → работает.
 
 ## Что это
 
@@ -21,7 +17,6 @@ work/
 ├── nginx/nginx.conf     # Прод: статика dist + пререндер, прокси /api и /sitemap.xml,
 │                        #       CSP, кэш-заголовки, 301 со слэш-дублей
 ├── secrets/             # Docker secrets: admin_password, jwt_secret, smtp_pass (вне git)
-├── docs/                # OPERATIONS.md, TECHNICAL-SPECIFICATION.md
 ├── docker-compose.yml   # postgres + backend + nginx + certbot (авто-renew TLS)
 └── deploy.sh / backup.sh / restore.sh
 ```
@@ -39,27 +34,48 @@ work/
 Нужны Node 24+ и Docker.
 
 ```bash
-# 1. БД
+# 1. Корневой .env — из него compose берёт POSTGRES_PASSWORD
+echo 'POSTGRES_PASSWORD=локальный-пароль' > .env
+
+# 2. Пароль админа: .env.example по умолчанию ждёт его файлом, а secrets/ вне git
+mkdir -p secrets && printf '%s' 'локальный-пароль-админа' > secrets/admin_password
+
+# 3. БД
 docker compose up -d postgres
 
-# 2. Бэкенд (:3001) — заполни .env по образцу
+# 4. Бэкенд (:3001) — заполни .env по образцу (DATABASE_URL, JWT_SECRET, ADMIN_LOGIN)
 cd mrdk-back && npm install && cp .env.example .env && npm run dev
 
-# 3. Фронтенд (:5173)
+# 5. Фронтенд (:5173)
 cd mrdk-front && npm install && npm run dev
 ```
 
-Открыть: сайт `http://localhost:5173`, админка `http://localhost:5173/admin`. Миграции и админ создаются автоматически при старте бэкенда.
+Открыть: сайт `http://localhost:5173`, админка `http://localhost:5173/admin`. Миграции и админ создаются автоматически при старте бэкенда: пароль из `secrets/admin_password` нужен только на первом старте (пустая БД), дальше сервер поднимается и без него.
 
 ## Деплой (Docker)
 
+На сервере — только скриптом:
+
 ```bash
-docker compose build && docker compose up -d
+./deploy.sh          # git pull --ff-only + сборка + up -d + ожидание healthcheck
+BACKUP_BEFORE=1 ./deploy.sh   # то же, но со снимком БД и загрузок перед миграциями
 ```
 
-Прод бежит на **скомпилированном** коде — после правок пересобирай нужный образ (`build` + `up -d`); для `nginx.conf` достаточно `restart nginx`. На сервере — `./deploy.sh` (`git pull` + `build` + `up -d` + ожидание healthcheck).
+⚠️ Руками на сервере `docker compose build` не гоняй: без аргументов он собирает сервисы **параллельно**, а это два Node-тулчейна разом — на VPS с 1 ГБ ОЗУ (где уже крутятся postgres, backend и nginx) сумма не влезает, машина уходит в своп и подвисает посреди деплоя. `deploy.sh` собирает по очереди. На машине разработчика ограничение неактуально: `docker compose build && docker compose up -d`.
 
-Полный рунбук (VPS, HTTPS/сертификат, миграция секретов, грабли nginx, CSP) — в [docs/OPERATIONS.md](docs/OPERATIONS.md).
+Прод бежит на **скомпилированном** коде — после правок пересобирай нужный образ (`build backend` или `build nginx`, затем `up -d`); для `nginx.conf` достаточно `restart nginx`, а после правки корневого `.env` бэкенд надо **пересоздать** (`up -d backend`), а не `restart`.
+
+Первый выпуск TLS-сертификата делается вручную (дальше certbot продлевает сам) — порядок в комментарии у `ssl_certificate` в [nginx/nginx.conf](nginx/nginx.conf). Остальные детали — там же в комментариях: [deploy.sh](deploy.sh) (порядок сборки, своп, healthcheck), [nginx/nginx.conf](nginx/nginx.conf) (HTTPS, прокси `/api`, CSP, кэш-заголовки), [docker-compose.yml](docker-compose.yml) (сервисы, тома, certbot).
+
+## Бэкапы
+
+```bash
+sudo ./backup.sh              # дамп БД + архив тома загрузок, ротация 14 дней
+sudo ./restore.sh list        # доступные копии
+sudo ./restore.sh <STAMP>     # восстановить БД + загрузки (перезапишет текущие!)
+```
+
+Регулярность — через cron (строка-образец в шапке [backup.sh](backup.sh)); по умолчанию копии ложатся в `/var/backups/mrdk`, переопределяется `BACKUP_DIR`. Подробности и подкоманды — в шапках [backup.sh](backup.sh) и [restore.sh](restore.sh).
 
 ## Переменные окружения и секреты (кратко)
 
@@ -68,9 +84,9 @@ docker compose build && docker compose up -d
 - корневой **`.env`** — переменные compose: БД, CORS, SMTP (без пароля), админ-логин, `SITE_ORIGIN`;
 - **`secrets/admin_password`**, **`secrets/jwt_secret`**, **`secrets/smtp_pass`** — docker secrets.
 
-`mrdk-front/.env.production` (build-переменные `VITE_*`) коммитится и приезжает с git. `mrdk-back/.env` и `mrdk-front/.env` — только для локального `npm run dev`.
+`mrdk-front/.env.production` (build-переменные `VITE_*`) коммитится и приезжает с git — секретов там нет, а значения вшиваются в бандл на `vite build`, поэтому их правка требует пересборки образа, а не рестарта. `mrdk-back/.env` и `mrdk-front/.env` — только для локального `npm run dev`.
 
-Таблица и детали — в [docs/OPERATIONS.md](docs/OPERATIONS.md#переменные-окружения-и-секреты).
+Полный список переменных с пояснениями — в самих файлах: [mrdk-back/.env.example](mrdk-back/.env.example) (бэкенд, dev), блок `environment` бэкенда в [docker-compose.yml](docker-compose.yml) (прод) и [mrdk-front/.env.production](mrdk-front/.env.production) (фронт).
 
 ## Тесты
 

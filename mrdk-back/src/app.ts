@@ -26,7 +26,7 @@ app.use(helmet({
         directives: {
             defaultSrc: ["'self'"],
             scriptSrc: ["'self'", "'unsafe-eval'", "https://mc.yandex.ru", "https://mc.yandex.com", "https://maps.api.2gis.ru"],
-            connectSrc: ["'self'", "https://mc.yandex.ru", "https://mc.yandex.com", "wss://mc.yandex.ru", "wss://mc.yandex.com", "https://yandex.ru", "https://maps.api.2gis.ru", "https://catalog.api.2gis.ru", "https://keys.api.2gis.com"],
+            connectSrc: ["'self'", "https://mc.yandex.ru", "https://mc.yandex.com", "wss://mc.yandex.ru", "wss://mc.yandex.com", "https://yandex.ru", "https://*.maps.2gis.com", "https://maps.api.2gis.ru", "https://catalog.api.2gis.ru", "https://keys.api.2gis.com"],
             imgSrc: ["'self'", "data:", "https://mc.yandex.ru", "https://mc.yandex.com", "https://*.maps.2gis.com", "https://maps.api.2gis.ru"],
             frameSrc: (["https://map.2gis.com", "https://mc.yandex.ru", "https://mc.yandex.com", process.env.GOSUSLUGI_ORIGIN] as (string | undefined)[]).filter(Boolean) as string[],
             styleSrc: ["'self'", "'unsafe-inline'", "https://maps.api.2gis.ru"],

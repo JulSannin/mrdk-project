@@ -38,12 +38,23 @@ const exists = await pool.query(
   [process.env.ADMIN_LOGIN]
 );
 if (exists.rows.length === 0) {
-  const adminPassword = process.env.ADMIN_PASSWORD_FILE
-    ? fs.readFileSync(process.env.ADMIN_PASSWORD_FILE, 'utf8').trim()
-    : process.env.ADMIN_PASSWORD;
+  // Путь может быть ЗАДАН, а файла не быть: .env.example проставляет
+  // ADMIN_PASSWORD_FILE=../secrets/admin_password по умолчанию, а secrets/ вне git —
+  // у нового разработчика первый старт падал сырым стеком ENOENT вместо понятного
+  // сообщения ниже. Отсутствующий/пустой файл = «пароль оттуда не взять», дальше
+  // пробуем ADMIN_PASSWORD.
+  const adminPasswordFile = process.env.ADMIN_PASSWORD_FILE;
+  const adminPassword =
+    (adminPasswordFile && fs.existsSync(adminPasswordFile)
+      ? fs.readFileSync(adminPasswordFile, 'utf8').trim()
+      : '') || process.env.ADMIN_PASSWORD;
 
   if (!adminPassword) {
-    throw new Error('Администратора нет в БД, а ADMIN_PASSWORD / ADMIN_PASSWORD_FILE не заданы — создать его не из чего');
+    throw new Error(
+      adminPasswordFile
+        ? `Администратора нет в БД, а пароль взять неоткуда: файл ${adminPasswordFile} отсутствует или пуст, ADMIN_PASSWORD не задан`
+        : 'Администратора нет в БД, а ADMIN_PASSWORD / ADMIN_PASSWORD_FILE не заданы — создать его не из чего'
+    );
   }
 
   const hash = await bcrypt.hash(adminPassword, 10);

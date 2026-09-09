@@ -4,6 +4,15 @@
 // Сюда входят только ИНДЕКСИРУЕМЫЕ статические маршруты (без /login, /admin, /404).
 
 export const SITE_NAME = 'Мариинский районный дом культуры';
+
+// ⚠️ Домен прописан в четырёх местах, и смена требует всех правок разом:
+//  1. SITE_ORIGIN здесь — og:url/og:image, пререндер, строка Sitemap: в robots.txt;
+//  2. SITE_ORIGIN в корневом .env + фолбэк в mrdk-back/src/controllers/sitemap.ts
+//     (иначе <loc> в sitemap.xml продолжит рекламировать поисковикам старый домен);
+//  3. server_name в ОБОИХ server-блоках nginx/nginx.conf;
+//  4. пути к сертификату там же (ssl_certificate/ssl_certificate_key) + выпуск нового
+//     сертификата на новый домен — иначе nginx просто не стартует.
+// Проверка после выката: curl -s https://<домен>/sitemap.xml | head, curl -s .../robots.txt
 export const SITE_ORIGIN = 'https://nn-lance.ru';
 
 export const SITE_DESCRIPTION =

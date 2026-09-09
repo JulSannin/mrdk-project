@@ -29,7 +29,14 @@ COPY migrations ./migrations
 
 # Не работаем от root: каталог загрузок отдаём пользователю node (uid 1000),
 # остальное (dist/migrations/node_modules) — root-овое, но world-readable (чтение ок).
-# Свежий том work_uploads на первом старте унаследует владельца node от этой точки.
+# Свежий том <каталог-клона>_uploads на первом старте унаследует владельца node
+# от этой точки (compose строит имя тома из каталога проекта: work/ -> work_uploads).
+# ⚠️ Если том создан РАНЬШЕ, чем появился USER node, он остался root-овым, и бэкенд
+# (uid 1000) ловит EACCES на каждую запись — админка не грузит ни одного файла.
+# Разово чинится снаружи:
+#   docker compose down
+#   docker run --rm -v <том>:/data alpine chown -R 1000:1000 /data
+#   docker compose up -d
 RUN mkdir -p uploads/events uploads/workplan uploads/documents uploads/reminders \
  && chown -R node:node uploads
 USER node
