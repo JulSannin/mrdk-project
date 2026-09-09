@@ -1,5 +1,5 @@
 import { socialLinks } from '../../shared/navigation/socialLinksData';
-import { BviImg } from '../../shared/ui/BviImg';
+import { BviImg } from '../../shared/bvi/BviImg';
 import styles from './Header.module.css';
 
 function NavSocialMedia() {

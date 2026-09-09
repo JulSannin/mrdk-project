@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import styles from './ExternalLinkCards.module.css';
 import { ListExternalLinkCards } from './ListExternalLinkCards';
-import { BviImg } from '../../shared/ui/BviImg';
+import { BviImg } from '../../shared/bvi/BviImg';
 
 function ExternalLinkCards() {
   return (

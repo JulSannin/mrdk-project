@@ -6,7 +6,7 @@ import type { ApiList, Reminder } from '../../entities/types';
 import apiClient from '../../shared/lib/apiClient';
 import uiStyles from '../../shared/ui/ui.module.css';
 import { ErrorMessage } from '../../shared/ui/ErrorMessage';
-import { BviImg } from '../../shared/ui/BviImg';
+import { BviImg } from '../../shared/bvi/BviImg';
 import { ReminderCard } from '../../entities/Reminder/ReminderCard';
 import ExternalLinkCards from '../../widgets/listExternalLinksCards/ExternalLinkCards';
 import VideoBlock from '../../widgets/videoBlock/VideoBlock';
@@ -130,6 +130,7 @@ export function RemindersPage() {
             </button>
             <BviImg
               className={styles.popupImage}
+              skeleton
               src={`/${selected.image_path}`}
               alt={selected.title}
             />

@@ -4,7 +4,7 @@ import type { ApiSingle, Event } from '../../entities/types';
 import apiClient from '../../shared/lib/apiClient';
 import { Skeleton } from '../../shared/ui/Skeleton';
 import { ErrorMessage } from '../../shared/ui/ErrorMessage';
-import { BviImg } from '../../shared/ui/BviImg';
+import { BviImg } from '../../shared/bvi/BviImg';
 import { formatDate } from '../../shared/lib/dateHelpers';
 import ExternalLinkCards from '../../widgets/listExternalLinksCards/ExternalLinkCards';
 import VideoBlock from '../../widgets/videoBlock/VideoBlock';
@@ -66,6 +66,7 @@ export function EventDetailPage() {
             </button>
             <BviImg
               className={styles.cover}
+              skeleton
               src={event.image_path ? `/${event.image_path}` : '/default.jpg'}
               alt={event.title}
             />
@@ -85,7 +86,7 @@ export function EventDetailPage() {
                 <h2 className={styles.galleryTitle}>Фотографии</h2>
                 <div className={styles.galleryGrid}>
                   {event.images.map((img) => (
-                    <BviImg key={img.id} src={`/${img.image_path}`} alt={event.title} />
+                    <BviImg key={img.id} skeleton src={`/${img.image_path}`} alt={event.title} />
                   ))}
                 </div>
               </div>

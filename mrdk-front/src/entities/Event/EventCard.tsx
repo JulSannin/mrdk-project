@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import type { Event } from '../types';
 import { formatDate } from '../../shared/lib/dateHelpers';
 import { truncate } from '../../shared/lib/stringHelpers';
-import { BviImg } from '../../shared/ui/BviImg';
+import { BviImg } from '../../shared/bvi/BviImg';
 import styles from './EventCard.module.css';
 
 const MAX_DESCRIPTION_LENGTH = 116;
@@ -17,6 +17,7 @@ function EventCard({ event, priority = false }: { event: Event; priority?: boole
         <div className={styles['event-card__image-wrap']}>
           <BviImg
             className={styles['event-card__image']}
+            skeleton
             src={event.image_path ? `/${event.image_path}` : '/default.jpg'}
             alt={event.title}
             loading={priority ? 'eager' : 'lazy'}

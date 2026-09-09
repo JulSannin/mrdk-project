@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 import { footerLinks } from '../../shared/navigation/footerLinksData';
 import logo from '../../shared/assets/logo_v2.svg';
 import { memo } from 'react';
-import { BviImg } from '../../shared/ui/BviImg';
+import { BviImg } from '../../shared/bvi/BviImg';
 import styles from './Footer.module.css';
 
 export function FooterLinks() {

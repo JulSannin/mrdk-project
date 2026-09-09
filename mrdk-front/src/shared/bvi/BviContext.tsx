@@ -54,7 +54,7 @@ export function BviProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<BviSettings>(loadSettings);
 
   // Состояние режима выражаем data-атрибутами на <html>, а вся стилизация —
-  // в app.css по этим атрибутам. Так компоненты ничего не знают про BVI.
+  // в bvi.css по этим атрибутам. Так компоненты ничего не знают про BVI.
   useEffect(() => {
     const el = document.documentElement;
     if (settings.enabled) {

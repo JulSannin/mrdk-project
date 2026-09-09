@@ -1,4 +1,4 @@
-import { useBvi } from '../../shared/ui/BviContext';
+import { useBvi } from '../../shared/bvi/BviContext';
 import NavSocialMedia from './NavSocialMedia';
 import styles from './Header.module.css';
 
