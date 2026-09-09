@@ -26,7 +26,7 @@ cd mrdk-front && npm install && npm run dev
 
 Первый старт на пустой БД заводит админа и требует пароль: `.env.example` указывает `ADMIN_PASSWORD_FILE=../secrets/admin_password`, то есть локально файл `secrets/admin_password` тоже нужно создать (или задать `ADMIN_PASSWORD`). Дальше сервер стартует и без него.
 
-Проверки (обе папки): `npm run lint`, `npm run typecheck`, `npm test`.
+Проверки (обе папки): `npm run lint`, `npm run typecheck`, `npm test`. Во фронте ещё две, и обе в CI: `npm run format:check` (Prettier) и `npm run lint:fsd` (steiger — линтер архитектуры FSD). Формат чинится одной командой: `npm run format`.
 
 ```bash
 # один файл тестов / один тест по имени
@@ -85,7 +85,11 @@ Feature-Sliced Design: `app/` (layout + роутер) → `pages/` → `widgets/
 
 Раннер — vitest в обоих пакетах (`environment: 'node'`, `include: src/**/*.test.ts`); покрытие точечное, по рискованным местам. Тесты исключены из прод-сборки бэкенда (`exclude` в [tsconfig.json](mrdk-back/tsconfig.json)) — не переноси в `src` код, который они мокают через рантайм-импорты.
 
-GitHub Actions живут **только** в корневом `.github/workflows` (`backend.yml`, `frontend.yml`): `npm ci → lint → typecheck → test`, у фронта плюс `build` (гард пререндера), Node 24, `paths`-фильтр по своей папке.
+GitHub Actions живут **только** в корневом `.github/workflows` (`backend.yml`, `frontend.yml`): `npm ci → lint → typecheck → test`, у фронта между ними ещё `format:check` и `lint:fsd`, а в конце `build` (гард пререндера). Node 24, `paths`-фильтр по своей папке.
+
+**Формат и архитектура фронта — машинные.** Prettier ([prettier.config.js](mrdk-front/prettier.config.js)) настроен под уже написанный код (одинарные кавычки, `;`, 2 пробела, ширина 100), а не наоборот; `eslint-config-prettier` подключён последним в [eslint.config.js](mrdk-front/eslint.config.js), поэтому формат — зона только форматтера. Steiger ([steiger.config.js](mrdk-front/steiger.config.js)) проверяет структуру FSD: имена слоёв и слайсов, зарезервированные каталоги, чрезмерное дробление, слайсы без ссылок. Четыре правила из `recommended` выключены осознанно (плоские слайсы без сегментов, отсутствие barrel-файлов, имя `shared/assets`) — причина у каждого записана в конфиге; не включай их, не будучи готовым перестроить все 21 слайс.
+
+⚠️ **Порядок импортов по слоям steiger здесь не стережёт** — проверено экспериментом: импорт `entities → pages` он не находит ни с `recommended`, ни с явно включёнными `no-higher-level-imports`/`no-cross-imports`/`import-locality`, ни при добавлении слайсу публичного API, ни через алиас вместо относительного пути. Так что «снизу вверх по слоям» — договорённость на ревью, а не машинная проверка. Практический вывод: **не заводи barrel-файлы и алиасы ради этой проверки — она от них не появляется**; подробности эксперимента в комментарии конфига.
 
 ## Секреты
 

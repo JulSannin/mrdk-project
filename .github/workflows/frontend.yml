@@ -30,6 +30,17 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      # Формат проверяем, но не чиним: CI не должен коммитить за автора.
+      # Локально чинится одной командой — npm run format.
+      - name: Format
+        run: npm run format:check
+
+      # Линтер структуры FSD: имена слоёв и слайсов, зарезервированные каталоги,
+      # дробление, слайсы без ссылок. Направление импортов он здесь НЕ ловит —
+      # отключённые правила и причины (с замерами) в steiger.config.js.
+      - name: FSD
+        run: npm run lint:fsd
+
       - name: Typecheck
         run: npm run typecheck
 

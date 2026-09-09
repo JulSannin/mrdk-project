@@ -88,9 +88,11 @@ sudo ./restore.sh <STAMP>     # восстановить БД + загрузки
 
 Полный список переменных с пояснениями — в самих файлах: [mrdk-back/.env.example](mrdk-back/.env.example) (бэкенд, dev), блок `environment` бэкенда в [docker-compose.yml](docker-compose.yml) (прод) и [mrdk-front/.env.production](mrdk-front/.env.production) (фронт).
 
-## Тесты
+## Тесты и проверки
 
 ```bash
 cd mrdk-back  && npm test && npm run lint && npm run typecheck
-cd mrdk-front && npm test && npm run lint && npm run typecheck
+cd mrdk-front && npm test && npm run lint && npm run typecheck && npm run format:check && npm run lint:fsd
 ```
+
+Во фронте формат держит Prettier (`npm run format` — починить), а структуру FSD — steiger (`npm run lint:fsd`: имена слоёв и слайсов, дробление, слайсы без ссылок). Обе проверки идут в CI. Направление импортов по слоям steiger не проверяет — почему, написано в `steiger.config.js`.
