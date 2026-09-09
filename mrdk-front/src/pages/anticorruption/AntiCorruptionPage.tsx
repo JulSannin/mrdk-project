@@ -17,7 +17,12 @@ export function AntiCorruptionPage() {
                   {doc.label}
                 </a>
               ) : (
-                <a className={styles.link} href={doc.href} target="_blank" rel="noopener noreferrer">
+                <a
+                  className={styles.link}
+                  href={doc.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   {doc.label}
                 </a>
               )}
@@ -27,8 +32,8 @@ export function AntiCorruptionPage() {
         </ul>
 
         <p className={styles.note}>
-          О фактах коррупционного проявления в учреждениях МБУК «Районный Дом культуры»
-          вы можете сообщить посредством формы обратной связи в{' '}
+          О фактах коррупционного проявления в учреждениях МБУК «Районный Дом культуры» вы можете
+          сообщить посредством формы обратной связи в{' '}
           <a
             className={styles.link}
             href="http://lib42.ru/feedback/mariinsk/"

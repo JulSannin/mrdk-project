@@ -16,7 +16,9 @@
   color: var(--color-black-g);
   font-weight: 600;
   text-decoration: none;
-  transition: border-color 0.15s ease, color 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .fallback:hover,

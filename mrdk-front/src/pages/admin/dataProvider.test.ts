@@ -19,7 +19,9 @@ const dp = dataProvider as unknown as {
   delete: (r: string, p: Params) => Promise<{ data: Row }>;
 };
 
-beforeEach(() => { vi.clearAllMocks(); });
+beforeEach(() => {
+  vi.clearAllMocks();
+});
 
 describe('dataProvider.getList', () => {
   it('events: пробрасывает page/limit + сортировку и нормализует event_date → eventDate', async () => {
@@ -51,7 +53,14 @@ describe('dataProvider.getList', () => {
 
 describe('dataProvider.getOne', () => {
   it('documents (download-ресурс): берёт запись из списка limit=100', async () => {
-    get.mockResolvedValueOnce({ data: { data: [{ id: 5, title: 'Doc5' }, { id: 6, title: 'Doc6' }] } });
+    get.mockResolvedValueOnce({
+      data: {
+        data: [
+          { id: 5, title: 'Doc5' },
+          { id: 6, title: 'Doc6' },
+        ],
+      },
+    });
     const res = await dp.getOne('documents', { id: 6 });
     expect(get).toHaveBeenCalledWith('/documents', { params: { page: 1, limit: 100 } });
     expect(res.data.id).toBe(6);

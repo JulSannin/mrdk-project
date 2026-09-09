@@ -68,7 +68,9 @@ export default function RootLayout() {
   // публичных страницах он не нужен и лишь зря дёргал /auth/me на каждой загрузке.
   return (
     <>
-      <a href="#main" className="skip-link">Перейти к содержимому</a>
+      <a href="#main" className="skip-link">
+        Перейти к содержимому
+      </a>
       <div className="topbar" ref={topbarRef}>
         <BviPanel />
         <Header />

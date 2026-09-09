@@ -15,7 +15,12 @@ import uiStyles from '../../shared/ui/ui.module.css';
 export function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { data: event, isPending, isError, refetch } = useQuery({
+  const {
+    data: event,
+    isPending,
+    isError,
+    refetch,
+  } = useQuery({
     queryKey: ['event', id],
     queryFn: () => apiClient.get<ApiSingle<Event>>(`/events/${id}`).then((r) => r.data.data),
   });
@@ -29,7 +34,13 @@ export function EventDetailPage() {
       : 'Событие Мариинского районного Дома культуры.',
   );
 
-  if (isError) return <><ErrorMessage message="Не удалось загрузить событие" onRetry={() => refetch()} /><ExternalLinkCards /></>;
+  if (isError)
+    return (
+      <>
+        <ErrorMessage message="Не удалось загрузить событие" onRetry={() => refetch()} />
+        <ExternalLinkCards />
+      </>
+    );
 
   // Один макет на оба состояния (как на списковых страницах): меняется только
   // содержимое <article>, обвязка не дублируется. key перезапускает fade-in.
@@ -60,7 +71,9 @@ export function EventDetailPage() {
             />
             <h1>{event.title}</h1>
             {event.event_date && (
-              <time className={styles.date} dateTime={event.event_date}>{formatDate(event.event_date)}</time>
+              <time className={styles.date} dateTime={event.event_date}>
+                {formatDate(event.event_date)}
+              </time>
             )}
             <div className={styles.description}>
               {event.description?.split('\n').map((line, i) => (

@@ -49,11 +49,36 @@ function prerenderStaticRoutes(): Plugin {
         const title = formatTitle(meta.title);
         const desc = escapeHtml(meta.description);
         let html = base;
-        html = replaceOrThrow(html, /<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(title)}</title>`, '<title>');
-        html = replaceOrThrow(html, /(<meta\s+name="description"\s+content=")[\s\S]*?(")/, `$1${desc}$2`, 'meta description');
-        html = replaceOrThrow(html, /(<meta\s+property="og:title"\s+content=")[\s\S]*?(")/, `$1${escapeHtml(title)}$2`, 'og:title');
-        html = replaceOrThrow(html, /(<meta\s+property="og:description"\s+content=")[\s\S]*?(")/, `$1${desc}$2`, 'og:description');
-        html = replaceOrThrow(html, /(<meta\s+property="og:url"\s+content=")[\s\S]*?(")/, `$1${escapeHtml(SITE_ORIGIN + path)}$2`, 'og:url');
+        html = replaceOrThrow(
+          html,
+          /<title>[\s\S]*?<\/title>/,
+          `<title>${escapeHtml(title)}</title>`,
+          '<title>',
+        );
+        html = replaceOrThrow(
+          html,
+          /(<meta\s+name="description"\s+content=")[\s\S]*?(")/,
+          `$1${desc}$2`,
+          'meta description',
+        );
+        html = replaceOrThrow(
+          html,
+          /(<meta\s+property="og:title"\s+content=")[\s\S]*?(")/,
+          `$1${escapeHtml(title)}$2`,
+          'og:title',
+        );
+        html = replaceOrThrow(
+          html,
+          /(<meta\s+property="og:description"\s+content=")[\s\S]*?(")/,
+          `$1${desc}$2`,
+          'og:description',
+        );
+        html = replaceOrThrow(
+          html,
+          /(<meta\s+property="og:url"\s+content=")[\s\S]*?(")/,
+          `$1${escapeHtml(SITE_ORIGIN + path)}$2`,
+          'og:url',
+        );
         const dir = join(dist, path);
         mkdirSync(dir, { recursive: true });
         writeFileSync(join(dir, 'index.html'), html);

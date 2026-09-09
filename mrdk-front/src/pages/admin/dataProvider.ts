@@ -129,7 +129,10 @@ export const dataProvider = {
       return { data: res.data.data as RaRecord };
     }
     if (resource === 'events') {
-      const { additionalImages, additionalVideos, ...rest } = params.data as Record<string, unknown>;
+      const { additionalImages, additionalVideos, ...rest } = params.data as Record<
+        string,
+        unknown
+      >;
       const res = await apiClient.post(`/${ep}`, toFormData(rest));
       const created = res.data.data as ApiRecord;
       // медиа грузим отдельными запросами после создания; если упадут — событие уже
@@ -138,7 +141,9 @@ export const dataProvider = {
         await postEventMedia(ep, created.id, 'images', additionalImages);
         await postEventMedia(ep, created.id, 'videos', additionalVideos);
       } catch {
-        throw new Error('Событие создано, но часть медиафайлов не загрузилась — добавьте их повторно через редактирование.');
+        throw new Error(
+          'Событие создано, но часть медиафайлов не загрузилась — добавьте их повторно через редактирование.',
+        );
       }
       return { data: normalize(resource, created) };
     }
@@ -153,14 +158,19 @@ export const dataProvider = {
       return { data: res.data.data as RaRecord };
     }
     if (resource === 'events') {
-      const { additionalImages, additionalVideos, ...rest } = params.data as Record<string, unknown>;
+      const { additionalImages, additionalVideos, ...rest } = params.data as Record<
+        string,
+        unknown
+      >;
       // сначала сохраняем поля события, затем догружаем новые медиа (как и при create)
       const res = await apiClient.patch(`/${ep}/${params.id}`, toFormData(rest));
       try {
         await postEventMedia(ep, params.id, 'images', additionalImages);
         await postEventMedia(ep, params.id, 'videos', additionalVideos);
       } catch {
-        throw new Error('Изменения сохранены, но часть медиафайлов не загрузилась — повторите загрузку.');
+        throw new Error(
+          'Изменения сохранены, но часть медиафайлов не загрузилась — повторите загрузку.',
+        );
       }
       return { data: normalize(resource, res.data.data as ApiRecord) };
     }

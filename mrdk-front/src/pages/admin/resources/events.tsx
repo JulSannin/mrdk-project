@@ -1,9 +1,20 @@
 import { useState } from 'react';
 import {
-  List, Datagrid, TextField, DateField,
-  Create, Edit, SimpleForm,
-  TextInput, ImageInput, ImageField, FileInput, FileField, required,
-  useRecordContext, useNotify,
+  List,
+  Datagrid,
+  TextField,
+  DateField,
+  Create,
+  Edit,
+  SimpleForm,
+  TextInput,
+  ImageInput,
+  ImageField,
+  FileInput,
+  FileField,
+  required,
+  useRecordContext,
+  useNotify,
 } from 'react-admin';
 import { RuDateInput } from '../RuDateInput';
 import { RowNumberField } from '../RowNumberField';
@@ -31,9 +42,7 @@ const GalleryManager = () => {
   const notify = useNotify();
   const [deletedIds, setDeletedIds] = useState<Set<number>>(new Set());
 
-  const images = ((record?.images as EventImage[]) ?? []).filter(
-    (img) => !deletedIds.has(img.id),
-  );
+  const images = ((record?.images as EventImage[]) ?? []).filter((img) => !deletedIds.has(img.id));
 
   const handleDelete = async (img: EventImage) => {
     try {
@@ -61,10 +70,16 @@ const GalleryManager = () => {
               type="button"
               onClick={() => handleDelete(img)}
               style={{
-                position: 'absolute', top: 4, right: 4,
-                background: 'rgba(0,0,0,0.6)', color: '#fff',
-                border: 'none', borderRadius: 4, cursor: 'pointer',
-                padding: '2px 6px', fontSize: 12,
+                position: 'absolute',
+                top: 4,
+                right: 4,
+                background: 'rgba(0,0,0,0.6)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 4,
+                cursor: 'pointer',
+                padding: '2px 6px',
+                fontSize: 12,
               }}
             >
               Удалить
@@ -81,9 +96,7 @@ const VideoManager = () => {
   const notify = useNotify();
   const [deletedIds, setDeletedIds] = useState<Set<number>>(new Set());
 
-  const videos = ((record?.videos as EventVideo[]) ?? []).filter(
-    (v) => !deletedIds.has(v.id),
-  );
+  const videos = ((record?.videos as EventVideo[]) ?? []).filter((v) => !deletedIds.has(v.id));
 
   const handleDelete = async (v: EventVideo) => {
     try {
@@ -111,10 +124,16 @@ const VideoManager = () => {
               type="button"
               onClick={() => handleDelete(v)}
               style={{
-                position: 'absolute', top: 4, right: 4,
-                background: 'rgba(0,0,0,0.6)', color: '#fff',
-                border: 'none', borderRadius: 4, cursor: 'pointer',
-                padding: '2px 6px', fontSize: 12,
+                position: 'absolute',
+                top: 4,
+                right: 4,
+                background: 'rgba(0,0,0,0.6)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 4,
+                cursor: 'pointer',
+                padding: '2px 6px',
+                fontSize: 12,
               }}
             >
               Удалить
@@ -148,7 +167,11 @@ const CurrentMainImage = () => {
         <p style={{ marginBottom: 8, color: '#666', fontSize: 13 }}>
           На сайте показывается заглушка. Загрузите фото ниже, чтобы заменить её.
         </p>
-        <img src="/default.jpg" alt="" style={{ width: 200, height: 'auto', borderRadius: 4, opacity: 0.6 }} />
+        <img
+          src="/default.jpg"
+          alt=""
+          style={{ width: 200, height: 'auto', borderRadius: 4, opacity: 0.6 }}
+        />
       </div>
     );
   }
@@ -166,10 +189,16 @@ const CurrentMainImage = () => {
           type="button"
           onClick={handleDelete}
           style={{
-            position: 'absolute', top: 4, right: 4,
-            background: 'rgba(0,0,0,0.6)', color: '#fff',
-            border: 'none', borderRadius: 4, cursor: 'pointer',
-            padding: '2px 6px', fontSize: 12,
+            position: 'absolute',
+            top: 4,
+            right: 4,
+            background: 'rgba(0,0,0,0.6)',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 4,
+            cursor: 'pointer',
+            padding: '2px 6px',
+            fontSize: 12,
           }}
         >
           Удалить

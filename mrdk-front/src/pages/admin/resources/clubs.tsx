@@ -1,6 +1,12 @@
 import {
-  List, Datagrid, TextField,
-  Create, Edit, SimpleForm, TextInput, required,
+  List,
+  Datagrid,
+  TextField,
+  Create,
+  Edit,
+  SimpleForm,
+  TextInput,
+  required,
 } from 'react-admin';
 import { RowNumberField } from '../RowNumberField';
 
@@ -21,5 +27,13 @@ const ClubForm = () => (
   </SimpleForm>
 );
 
-export const ClubCreate = () => (<Create redirect="list"><ClubForm /></Create>);
-export const ClubEdit = () => (<Edit><ClubForm /></Edit>);
+export const ClubCreate = () => (
+  <Create redirect="list">
+    <ClubForm />
+  </Create>
+);
+export const ClubEdit = () => (
+  <Edit>
+    <ClubForm />
+  </Edit>
+);

@@ -7,9 +7,9 @@ import { router } from './app/routes';
 import './app/app.css';
 
 createRoot(document.getElementById('root')!).render(
-    <BviProvider>
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-      </QueryClientProvider>
-    </BviProvider>
+  <BviProvider>
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  </BviProvider>,
 );

@@ -9,7 +9,12 @@ import styles from './ClubsPage.module.css';
 import uiStyles from '../../shared/ui/ui.module.css';
 
 export function ClubsPage() {
-  const { data: clubs, isPending, isError, refetch } = useQuery({
+  const {
+    data: clubs,
+    isPending,
+    isError,
+    refetch,
+  } = useQuery({
     queryKey: ['clubs'],
     queryFn: () => apiClient.get<ApiSingle<Club[]>>('/clubs').then((r) => r.data.data),
   });
@@ -38,17 +43,20 @@ export function ClubsPage() {
               <caption className={uiStyles.srOnly}>Список клубов и руководителей</caption>
               <thead>
                 <tr>
-                  <th scope="col" className={`${styles.th} ${styles.numCol}`}>№</th>
-                  <th scope="col" className={styles.th}>Название</th>
-                  <th scope="col" className={styles.th}>Руководитель</th>
+                  <th scope="col" className={`${styles.th} ${styles.numCol}`}>
+                    №
+                  </th>
+                  <th scope="col" className={styles.th}>
+                    Название
+                  </th>
+                  <th scope="col" className={styles.th}>
+                    Руководитель
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {(clubs ?? []).map((club, index) => (
-                  <tr
-                    key={club.id}
-                    className={`${styles.tr} ${index % 2 === 0 ? '' : styles.odd}`}
-                  >
+                  <tr key={club.id} className={`${styles.tr} ${index % 2 === 0 ? '' : styles.odd}`}>
                     <td className={`${styles.td} ${styles.numCol}`}>{index + 1}</td>
                     <td className={styles.td}>{club.name}</td>
                     <td className={styles.td}>{club.leader || '—'}</td>

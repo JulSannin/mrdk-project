@@ -40,17 +40,32 @@ export function BviPanel() {
 
   const fontIdx = FONT_LEVELS.indexOf(bvi.fontSize);
   const stepFont = (delta: number) =>
-    bvi.set('fontSize', FONT_LEVELS[Math.min(FONT_LEVELS.length - 1, Math.max(0, fontIdx + delta))]);
+    bvi.set(
+      'fontSize',
+      FONT_LEVELS[Math.min(FONT_LEVELS.length - 1, Math.max(0, fontIdx + delta))],
+    );
 
   return (
     <aside className={`bvi-panel ${styles.panel}`} aria-label="Настройки версии для слабовидящих">
       <div className={styles.group} role="group" aria-label="Размер шрифта">
         <span className={styles.title}>Размер шрифта</span>
         <div className={styles.btnGroup}>
-          <button type="button" className={styles.btn} onClick={() => stepFont(-1)} disabled={fontIdx <= 0} aria-label="Уменьшить шрифт">
+          <button
+            type="button"
+            className={styles.btn}
+            onClick={() => stepFont(-1)}
+            disabled={fontIdx <= 0}
+            aria-label="Уменьшить шрифт"
+          >
             A−
           </button>
-          <button type="button" className={styles.btn} onClick={() => stepFont(1)} disabled={fontIdx >= FONT_LEVELS.length - 1} aria-label="Увеличить шрифт">
+          <button
+            type="button"
+            className={styles.btn}
+            onClick={() => stepFont(1)}
+            disabled={fontIdx >= FONT_LEVELS.length - 1}
+            aria-label="Увеличить шрифт"
+          >
             A+
           </button>
         </div>
@@ -98,7 +113,13 @@ export function BviPanel() {
         <span className={styles.title}>Строки</span>
         <div className={styles.btnGroup}>
           {SPACING.map(([v, t]) => (
-            <button key={v} type="button" className={styles.btn} aria-pressed={bvi.lineHeight === v} onClick={() => bvi.set('lineHeight', v)}>
+            <button
+              key={v}
+              type="button"
+              className={styles.btn}
+              aria-pressed={bvi.lineHeight === v}
+              onClick={() => bvi.set('lineHeight', v)}
+            >
               {t}
             </button>
           ))}
@@ -109,7 +130,13 @@ export function BviPanel() {
         <span className={styles.title}>Буквы</span>
         <div className={styles.btnGroup}>
           {SPACING.map(([v, t]) => (
-            <button key={v} type="button" className={styles.btn} aria-pressed={bvi.letterSpacing === v} onClick={() => bvi.set('letterSpacing', v)}>
+            <button
+              key={v}
+              type="button"
+              className={styles.btn}
+              aria-pressed={bvi.letterSpacing === v}
+              onClick={() => bvi.set('letterSpacing', v)}
+            >
               {t}
             </button>
           ))}
@@ -119,7 +146,13 @@ export function BviPanel() {
       <div className={styles.group}>
         <span className={styles.title}>Дополнительно</span>
         <div className={styles.btnGroup}>
-          <button type="button" className={styles.btn} onClick={() => bvi.set('panelHidden', true)} title="Скрыть панель" aria-label="Скрыть панель">
+          <button
+            type="button"
+            className={styles.btn}
+            onClick={() => bvi.set('panelHidden', true)}
+            title="Скрыть панель"
+            aria-label="Скрыть панель"
+          >
             Скрыть панель
           </button>
           <button type="button" className={styles.btn} onClick={bvi.disable}>

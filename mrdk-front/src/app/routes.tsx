@@ -43,10 +43,30 @@ export const router = createBrowserRouter([
       { path: '/workplan', element: <WorkPlanPage />, handle: STATIC_ROUTES['/workplan'] },
       { path: '/documents', element: <DocumentsPage />, handle: STATIC_ROUTES['/documents'] },
       { path: '/reminders', element: <RemindersPage />, handle: STATIC_ROUTES['/reminders'] },
-      { path: '/anticorruption', element: <AntiCorruptionPage />, handle: STATIC_ROUTES['/anticorruption'] },
+      {
+        path: '/anticorruption',
+        element: <AntiCorruptionPage />,
+        handle: STATIC_ROUTES['/anticorruption'],
+      },
       { path: '/contacts', element: <ContactsPage />, handle: STATIC_ROUTES['/contacts'] },
-      { path: '/login', element: <Suspense fallback={null}><LoginPage /></Suspense>, handle: { title: 'Вход в админ-панель' } },
-      { path: '/admin/*', element: <Suspense fallback={null}><AdminApp /></Suspense>, handle: { title: 'Админ-панель' } },
+      {
+        path: '/login',
+        element: (
+          <Suspense fallback={null}>
+            <LoginPage />
+          </Suspense>
+        ),
+        handle: { title: 'Вход в админ-панель' },
+      },
+      {
+        path: '/admin/*',
+        element: (
+          <Suspense fallback={null}>
+            <AdminApp />
+          </Suspense>
+        ),
+        handle: { title: 'Админ-панель' },
+      },
       { path: '*', element: <NotFoundPage />, handle: { title: 'Страница не найдена' } },
     ],
   },

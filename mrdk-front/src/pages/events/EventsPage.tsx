@@ -36,7 +36,9 @@ export function EventsPage() {
     queryKey: ['events', year, page],
     queryFn: () =>
       apiClient
-        .get<ApiList<Event>>('/events', { params: { page, limit: LIMIT, ...(year ? { year } : {}) } })
+        .get<ApiList<Event>>('/events', {
+          params: { page, limit: LIMIT, ...(year ? { year } : {}) },
+        })
         .then((r) => r.data),
     // при смене страницы/года прежние карточки остаются на экране (слегка притушены —
     // .updating), пагинатор не размонтируется и фокус/высота не прыгают; скелетон —
@@ -62,7 +64,12 @@ export function EventsPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (isError) return <><ErrorMessage onRetry={() => refetch()} /> <ExternalLinkCards /></>;
+  if (isError)
+    return (
+      <>
+        <ErrorMessage onRetry={() => refetch()} /> <ExternalLinkCards />
+      </>
+    );
 
   const events = data?.data ?? [];
   const pageCount = data ? Math.ceil(data.total / LIMIT) : 0;
@@ -74,7 +81,9 @@ export function EventsPage() {
 
         {years.length > 0 && (
           <div className={styles.filter}>
-            <label htmlFor="year-select" className={styles['filter-label']}>Год:</label>
+            <label htmlFor="year-select" className={styles['filter-label']}>
+              Год:
+            </label>
             <select
               id="year-select"
               className={styles['year-select']}

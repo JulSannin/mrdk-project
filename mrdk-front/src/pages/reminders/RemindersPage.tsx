@@ -25,7 +25,9 @@ export function RemindersPage() {
   const { data, isPending, isPlaceholderData, isError, refetch } = useQuery({
     queryKey: ['reminders', page],
     queryFn: () =>
-      apiClient.get<ApiList<Reminder>>('/reminders', { params: { page, limit: LIMIT } }).then((r) => r.data),
+      apiClient
+        .get<ApiList<Reminder>>('/reminders', { params: { page, limit: LIMIT } })
+        .then((r) => r.data),
     // при смене страницы прежние карточки остаются на экране (притушены — .updating),
     // пагинатор не размонтируется; скелетон — только на первой загрузке (см. EventsPage)
     placeholderData: keepPreviousData,
@@ -55,7 +57,12 @@ export function RemindersPage() {
     };
   }, [selected]);
 
-  if (isError) return <><ErrorMessage onRetry={() => refetch()} /> <ExternalLinkCards /> </>;
+  if (isError)
+    return (
+      <>
+        <ErrorMessage onRetry={() => refetch()} /> <ExternalLinkCards />{' '}
+      </>
+    );
 
   const reminders = data?.data ?? [];
   const pageCount = data ? Math.ceil(data.total / LIMIT) : 0;
@@ -108,7 +115,9 @@ export function RemindersPage() {
             // Закрываем только по клику в саму подложку, а не по любому всплывшему:
             // иначе дети обязаны глушить всплытие, а картинка в BVI-режиме (там
             // <span> без обработчиков) этого не может.
-            onClick={(e) => { if (e.target === e.currentTarget) setSelected(null); }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setSelected(null);
+            }}
           >
             <button
               ref={closeBtnRef}

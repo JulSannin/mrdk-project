@@ -20,11 +20,12 @@ function cardsForColumns(cols: number): number {
 }
 
 export function HomePage() {
-
   const { data, isPending, isError, refetch } = useQuery({
     queryKey: ['events', 'home'],
     queryFn: () =>
-      apiClient.get<ApiList<Event>>('/events', { params: { limit: MAX_CARDS } }).then((r) => r.data),
+      apiClient
+        .get<ApiList<Event>>('/events', { params: { limit: MAX_CARDS } })
+        .then((r) => r.data),
   });
 
   const [visible, setVisible] = useState(4);
@@ -52,15 +53,17 @@ export function HomePage() {
       <section className={uiStyles.srOnly}>
         <h1>Мариинский районный Дом культуры</h1>
         <p>
-          Учреждение культуры Мариинского муниципального округа: афиша и фотоотчёты
-          мероприятий, клубные формирования и кружки, планы работы, документы и контакты.
+          Учреждение культуры Мариинского муниципального округа: афиша и фотоотчёты мероприятий,
+          клубные формирования и кружки, планы работы, документы и контакты.
         </p>
       </section>
 
       <section className={styles.section}>
         <div className={styles.head}>
           <h2 className={styles.heading}>Последние события</h2>
-          <Link to="/events" className={styles.allLink}>Все события →</Link>
+          <Link to="/events" className={styles.allLink}>
+            Все события →
+          </Link>
         </div>
 
         {isError ? (

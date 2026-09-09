@@ -7,8 +7,8 @@ import './reactPaginate.css';
 // `{ default: fn, __esModule: true }` — React падает с "Element type is invalid".
 // Разворачиваем дефолт здесь же и навешиваем классы по умолчанию, чтобы
 // пагинация была одинаково стилизована на всех страницах.
-const Base = ((ReactPaginateRaw as unknown as { default?: typeof ReactPaginateRaw })
-  .default ?? ReactPaginateRaw) as typeof ReactPaginateRaw;
+const Base = ((ReactPaginateRaw as unknown as { default?: typeof ReactPaginateRaw }).default ??
+  ReactPaginateRaw) as typeof ReactPaginateRaw;
 
 type Props = ComponentProps<typeof ReactPaginateRaw>;
 

@@ -15,10 +15,17 @@ export function WorkPlanPage() {
   const { data, isPending, isError, refetch } = useQuery({
     queryKey: ['workplan'],
     queryFn: () =>
-      apiClient.get<ApiList<WorkPlanItem>>('/workplan', { params: { limit: LIMIT } }).then((r) => r.data),
+      apiClient
+        .get<ApiList<WorkPlanItem>>('/workplan', { params: { limit: LIMIT } })
+        .then((r) => r.data),
   });
 
-  if (isError) return <><ErrorMessage onRetry={() => refetch()} /> <ExternalLinkCards /></>;
+  if (isError)
+    return (
+      <>
+        <ErrorMessage onRetry={() => refetch()} /> <ExternalLinkCards />
+      </>
+    );
 
   const groups: { year: number | null; items: WorkPlanItem[] }[] = [];
   for (const item of data?.data ?? []) {
@@ -35,7 +42,9 @@ export function WorkPlanPage() {
         {isPending ? (
           <ul key="skeleton" className={styles.grid}>
             {Array.from({ length: 20 }, (_, i) => (
-              <li key={i}><Skeleton height="150px" /></li>
+              <li key={i}>
+                <Skeleton height="150px" />
+              </li>
             ))}
           </ul>
         ) : groups.length === 0 ? (

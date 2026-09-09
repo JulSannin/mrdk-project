@@ -29,8 +29,7 @@ export function ContactsMap({ fallbackHref }: { fallbackHref: string }) {
           map.fitBounds(DG.latLngBounds(coords), { padding: [40, 40] });
         }
       })
-      .catch(() => {
-      });
+      .catch(() => {});
 
     return () => {
       destroyed = true;

@@ -1,6 +1,14 @@
 import {
-  List, Datagrid, TextField,
-  Create, Edit, SimpleForm, TextInput, ImageInput, ImageField, required,
+  List,
+  Datagrid,
+  TextField,
+  Create,
+  Edit,
+  SimpleForm,
+  TextInput,
+  ImageInput,
+  ImageField,
+  required,
   useRecordContext,
 } from 'react-admin';
 import { RowNumberField } from '../RowNumberField';
@@ -43,5 +51,13 @@ const ReminderForm = ({ create = false }: { create?: boolean }) => (
   </SimpleForm>
 );
 
-export const ReminderCreate = () => (<Create redirect="list"><ReminderForm create /></Create>);
-export const ReminderEdit = () => (<Edit><ReminderForm /></Edit>);
+export const ReminderCreate = () => (
+  <Create redirect="list">
+    <ReminderForm create />
+  </Create>
+);
+export const ReminderEdit = () => (
+  <Edit>
+    <ReminderForm />
+  </Edit>
+);

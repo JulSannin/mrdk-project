@@ -12,11 +12,7 @@ const MAX_DESCRIPTION_LENGTH = 116;
 // задержку LCP (первая карточка — обычно самый крупный элемент первого экрана).
 function EventCard({ event, priority = false }: { event: Event; priority?: boolean }) {
   return (
-    <Link
-      to={`/events/${event.id}`}
-      className={styles['event-card-link']}
-      viewTransition
-    >
+    <Link to={`/events/${event.id}`} className={styles['event-card-link']} viewTransition>
       <article id={`event-${event.id}`} className={styles['event-card']}>
         <div className={styles['event-card__image-wrap']}>
           <BviImg

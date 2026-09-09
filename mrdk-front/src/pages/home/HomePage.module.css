@@ -48,10 +48,26 @@
 
 /* Карточка-заглушка (.cardSkeleton) — общая, в shared/ui/ui.module.css. */
 
-@media (min-width: 620px)  { .grid { grid-template-columns: repeat(2, minmax(0, 300px)); } }
-@media (min-width: 940px)  { .grid { grid-template-columns: repeat(3, minmax(0, 300px)); } }
-@media (min-width: 1280px) { .grid { grid-template-columns: repeat(4, minmax(0, 300px)); } }
-@media (min-width: 1660px) { .grid { grid-template-columns: repeat(4, minmax(0, 400px)); } }
+@media (min-width: 620px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 300px));
+  }
+}
+@media (min-width: 940px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 300px));
+  }
+}
+@media (min-width: 1280px) {
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 300px));
+  }
+}
+@media (min-width: 1660px) {
+  .grid {
+    grid-template-columns: repeat(4, minmax(0, 400px));
+  }
+}
 
 @media (max-width: 600px) {
   .heading {

@@ -13,7 +13,9 @@ export function RouteError() {
       <h1>Что-то пошло не так</h1>
       <p>Попробуйте обновить страницу или вернуться на главную.</p>
       <div className={styles['route-error__actions']}>
-        <button type="button" onClick={() => window.location.reload()}>Обновить</button>
+        <button type="button" onClick={() => window.location.reload()}>
+          Обновить
+        </button>
         <Link to="/">На главную</Link>
       </div>
     </div>

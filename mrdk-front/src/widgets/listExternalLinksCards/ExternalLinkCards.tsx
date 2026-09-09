@@ -16,7 +16,14 @@ function ExternalLinkCards() {
               className={styles.card}
               aria-label={title}
             >
-              <BviImg className={styles.image} src={image} alt={title ?? ''} fetchPriority="high" width={300} height={150}/>
+              <BviImg
+                className={styles.image}
+                src={image}
+                alt={title ?? ''}
+                fetchPriority="high"
+                width={300}
+                height={150}
+              />
             </a>
           </li>
         ))}

@@ -27,16 +27,41 @@ export function AdminApp() {
       i18nProvider={i18nProvider}
       loginPage={false}
     >
-      <Resource name="events" options={{ label: 'События' }}
-        list={EventList} create={EventCreate} edit={EventEdit} />
-      <Resource name="workplan" options={{ label: 'План работы' }}
-        list={WorkPlanList} create={WorkPlanCreate} edit={WorkPlanEdit} />
-      <Resource name="documents" options={{ label: 'Документы' }}
-        list={DocumentList} create={DocumentCreate} edit={DocumentEdit} />
-      <Resource name="reminders" options={{ label: 'Памятки' }}
-        list={ReminderList} create={ReminderCreate} edit={ReminderEdit} />
-      <Resource name="clubs" options={{ label: 'Клубы' }}
-        list={ClubList} create={ClubCreate} edit={ClubEdit} />
+      <Resource
+        name="events"
+        options={{ label: 'События' }}
+        list={EventList}
+        create={EventCreate}
+        edit={EventEdit}
+      />
+      <Resource
+        name="workplan"
+        options={{ label: 'План работы' }}
+        list={WorkPlanList}
+        create={WorkPlanCreate}
+        edit={WorkPlanEdit}
+      />
+      <Resource
+        name="documents"
+        options={{ label: 'Документы' }}
+        list={DocumentList}
+        create={DocumentCreate}
+        edit={DocumentEdit}
+      />
+      <Resource
+        name="reminders"
+        options={{ label: 'Памятки' }}
+        list={ReminderList}
+        create={ReminderCreate}
+        edit={ReminderEdit}
+      />
+      <Resource
+        name="clubs"
+        options={{ label: 'Клубы' }}
+        list={ClubList}
+        create={ClubCreate}
+        edit={ClubEdit}
+      />
     </Admin>
   );
 }

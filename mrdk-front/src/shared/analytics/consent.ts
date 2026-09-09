@@ -33,7 +33,9 @@ export function acceptConsent(): void {
 
 export function subscribe(listener: () => void): () => void {
   listeners.add(listener);
-  return () => { listeners.delete(listener); };
+  return () => {
+    listeners.delete(listener);
+  };
 }
 
 export function useConsent(): boolean {

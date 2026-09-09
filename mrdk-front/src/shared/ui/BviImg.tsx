@@ -36,5 +36,7 @@ export function BviImg({ alt, className, style, width, height, ...rest }: BviImg
     );
   }
 
-  return <img alt={alt} className={className} style={style} width={width} height={height} {...rest} />;
+  return (
+    <img alt={alt} className={className} style={style} width={width} height={height} {...rest} />
+  );
 }

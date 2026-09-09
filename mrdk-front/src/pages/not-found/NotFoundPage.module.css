@@ -38,7 +38,9 @@
   color: var(--color-black-g);
   font-weight: 600;
   text-decoration: none;
-  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  transition:
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
 }
 
 .homeLink:hover {

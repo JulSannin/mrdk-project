@@ -1,15 +1,37 @@
 import {
-  List, Datagrid, TextField, NumberField, FunctionField,
-  Create, Edit, SimpleForm, TextInput, NumberInput, SelectInput, FileInput, FileField, required, minValue, maxValue,
+  List,
+  Datagrid,
+  TextField,
+  NumberField,
+  FunctionField,
+  Create,
+  Edit,
+  SimpleForm,
+  TextInput,
+  NumberInput,
+  SelectInput,
+  FileInput,
+  FileField,
+  required,
+  minValue,
+  maxValue,
   useRecordContext,
 } from 'react-admin';
 import { RowNumberField } from '../RowNumberField';
 
 const MONTHS = [
-  { id: 1, name: 'Январь' }, { id: 2, name: 'Февраль' }, { id: 3, name: 'Март' },
-  { id: 4, name: 'Апрель' }, { id: 5, name: 'Май' }, { id: 6, name: 'Июнь' },
-  { id: 7, name: 'Июль' }, { id: 8, name: 'Август' }, { id: 9, name: 'Сентябрь' },
-  { id: 10, name: 'Октябрь' }, { id: 11, name: 'Ноябрь' }, { id: 12, name: 'Декабрь' },
+  { id: 1, name: 'Январь' },
+  { id: 2, name: 'Февраль' },
+  { id: 3, name: 'Март' },
+  { id: 4, name: 'Апрель' },
+  { id: 5, name: 'Май' },
+  { id: 6, name: 'Июнь' },
+  { id: 7, name: 'Июль' },
+  { id: 8, name: 'Август' },
+  { id: 9, name: 'Сентябрь' },
+  { id: 10, name: 'Октябрь' },
+  { id: 11, name: 'Ноябрь' },
+  { id: 12, name: 'Декабрь' },
 ];
 
 const monthName = (m: unknown): string => MONTHS.find((x) => x.id === m)?.name ?? '';
@@ -64,5 +86,13 @@ const WorkPlanForm = ({ create = false }: { create?: boolean }) => (
   </SimpleForm>
 );
 
-export const WorkPlanCreate = () => (<Create redirect="list"><WorkPlanForm create /></Create>);
-export const WorkPlanEdit = () => (<Edit><WorkPlanForm /></Edit>);
+export const WorkPlanCreate = () => (
+  <Create redirect="list">
+    <WorkPlanForm create />
+  </Create>
+);
+export const WorkPlanEdit = () => (
+  <Edit>
+    <WorkPlanForm />
+  </Edit>
+);

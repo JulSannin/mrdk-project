@@ -14,10 +14,17 @@ export function DocumentsPage() {
   const { data, isPending, isError, refetch } = useQuery({
     queryKey: ['documents'],
     queryFn: () =>
-      apiClient.get<ApiList<Document>>('/documents', { params: { limit: LIMIT } }).then((r) => r.data),
+      apiClient
+        .get<ApiList<Document>>('/documents', { params: { limit: LIMIT } })
+        .then((r) => r.data),
   });
 
-  if (isError) return <><ErrorMessage onRetry={() => refetch()} /> <ExternalLinkCards /></>;
+  if (isError)
+    return (
+      <>
+        <ErrorMessage onRetry={() => refetch()} /> <ExternalLinkCards />
+      </>
+    );
 
   const items = data?.data ?? [];
 
@@ -29,7 +36,9 @@ export function DocumentsPage() {
         {isPending ? (
           <ul key="skeleton" className={styles.grid}>
             {Array.from({ length: 15 }, (_, i) => (
-              <li key={i}><Skeleton height="150px" /></li>
+              <li key={i}>
+                <Skeleton height="150px" />
+              </li>
             ))}
           </ul>
         ) : items.length === 0 ? (

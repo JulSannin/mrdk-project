@@ -39,7 +39,9 @@
   color: var(--color-text);
   font: inherit;
   cursor: pointer;
-  transition: background-color 0.15s, border-color 0.15s;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s;
 }
 
 .back:hover {
@@ -52,7 +54,6 @@
   border-radius: 10px;
   max-width: 100%;
   height: auto;
-
 }
 
 .description {

@@ -1,6 +1,14 @@
 import {
-  List, Datagrid, TextField,
-  Create, Edit, SimpleForm, TextInput, FileInput, FileField, required,
+  List,
+  Datagrid,
+  TextField,
+  Create,
+  Edit,
+  SimpleForm,
+  TextInput,
+  FileInput,
+  FileField,
+  required,
   useRecordContext,
 } from 'react-admin';
 import { RowNumberField } from '../RowNumberField';
@@ -48,5 +56,13 @@ const DocumentForm = ({ create = false }: { create?: boolean }) => (
   </SimpleForm>
 );
 
-export const DocumentCreate = () => (<Create redirect="list"><DocumentForm create /></Create>);
-export const DocumentEdit = () => (<Edit><DocumentForm /></Edit>);
+export const DocumentCreate = () => (
+  <Create redirect="list">
+    <DocumentForm create />
+  </Create>
+);
+export const DocumentEdit = () => (
+  <Edit>
+    <DocumentForm />
+  </Edit>
+);

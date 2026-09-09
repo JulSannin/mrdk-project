@@ -6,7 +6,6 @@ import NavActions from './NavActions';
 import BurgerMenuPanel from './burger-menu/BurgerMenuPanel';
 import styles from './Header.module.css';
 
-
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const toggleMenu = useCallback(() => setIsOpen((prev) => !prev), []);

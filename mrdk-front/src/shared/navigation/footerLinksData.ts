@@ -4,17 +4,17 @@ export const footerLinks: FooterLink[] = [
   {
     type: 'internal',
     path: '/',
-    label: 'Главная'
+    label: 'Главная',
   },
   {
     type: 'internal',
     path: '/events',
-    label: 'События'
+    label: 'События',
   },
   {
     type: 'internal',
     path: '/clubs',
-    label: 'Клубы'
+    label: 'Клубы',
   },
   {
     type: 'internal',
@@ -29,7 +29,7 @@ export const footerLinks: FooterLink[] = [
   {
     type: 'internal',
     path: '/reminders',
-    label: 'Памятки'
+    label: 'Памятки',
   },
   {
     type: 'internal',

@@ -13,7 +13,7 @@ export const headerLinks: NavLinkItem[] = [
   {
     type: 'internal',
     path: '/clubs',
-    label: 'Клубы'
+    label: 'Клубы',
   },
   {
     type: 'internal',
@@ -28,7 +28,7 @@ export const headerLinks: NavLinkItem[] = [
   {
     type: 'internal',
     path: '/reminders',
-    label: 'Памятки'
+    label: 'Памятки',
   },
   {
     type: 'internal',
