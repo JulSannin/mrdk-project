@@ -147,7 +147,7 @@ FSD, импорты сверху вниз: `app/` (layout + роутер) → `p
 | `pages/` | 10 слайсов публичных страниц (включая 404) + `admin/` + `admin-login/` |
 | `widgets/` | `header` (+ бургер), `footer`, `consentBanner`, `videoBlock`, `listExternalLinksCards` |
 | `entities/` | `Event`, `Reminder`, `Document`, `WorkPlanItem` — карточки и типы |
-| `shared/` | `lib` (apiClient, queryClient, даты, строки, пагинатор, 2ГИС), `bvi`, `analytics`, `config`, `ui`, `navigation`, `assets` |
+| `shared/` | `lib` (apiClient, queryClient, даты, строки, пагинатор), `bvi`, `analytics`, `config`, `ui`, `navigation`, `assets` |
 
 **Маршруты и данные.** Публичные страницы импортируются статически; лениво грузятся только `/admin` и `/login`.
 
@@ -160,7 +160,7 @@ FSD, импорты сверху вниз: `app/` (layout + роутер) → `p
 | `/workplan` | `GET /workplan` | 100 |
 | `/documents` | `GET /documents` | 100 |
 | `/clubs` | `GET /clubs` | всё |
-| `/contacts` | `POST /feedback` | — |
+| `/contacts` | `POST /feedback` (по отправке формы) | + iframe карты с `yandex.ru` |
 | `/anticorruption` | — | статика |
 
 Данные — TanStack Query поверх axios (`withCredentials`, baseURL `/api`), `staleTime` 30 с, `retry` 1, без `refetchOnWindowFocus`. Списки на `placeholderData: keepPreviousData`: при пагинации прежние карточки остаются на экране притушенными, скелетон — только на первой загрузке.
@@ -170,6 +170,8 @@ FSD, импорты сверху вниз: `app/` (layout + роутер) → `p
 **БВИ** (режим для слабовидящих) — отдельный слайс `shared/bvi`: контекст, панель, `BviImg`. В режиме «изображения выкл» вместо картинки рендерится блок того же размера с текстом `alt`, поэтому список пропсов `BviImg` задан явно через `Pick`, а не унаследован от `ImgHTMLAttributes`.
 
 **Аналитика.** Скрипт Яндекс.Метрики не подключается и хиты не отправляются до согласия на обработку ПД. Стор согласия — `useSyncExternalStore` с запасным хранением в памяти на случай недоступного `localStorage`.
+
+**Карта.** `/contacts` встраивает iframe Яндекс.Конструктора — единственный сторонний фрейм на сайте, отсюда `frame-src https://yandex.ru` в CSP. Метки заданы в кабинете Яндекса, а не в коде: в репозитории лежит только ссылка с `um=constructor:<хэш>`, ключ API не нужен. Под правило про согласие карта, в отличие от Метрики, не подпадает — iframe грузится вместе со страницей.
 
 ## Админка
 

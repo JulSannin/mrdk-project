@@ -40,7 +40,7 @@ const branches = [
   'Первомайский СДК (сельский дом культуры)',
 ];
 
-const mapLink = `https://2gis.ru/search/${encodeURIComponent('Кемеровская область, Мариинский округ, деревня 2-я Пристань, улица Весенняя, 13')}`;
+const mapLink = `https://yandex.ru/maps/?text=${encodeURIComponent('Кемеровская область, Мариинский округ, деревня 2-я Пристань, улица Весенняя, 13')}`;
 
 function serverErrorText(error: unknown): string {
   if (axios.isAxiosError(error)) {

@@ -25,11 +25,14 @@ app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-eval'", "https://mc.yandex.ru", "https://mc.yandex.com", "https://maps.api.2gis.ru"],
-            connectSrc: ["'self'", "https://mc.yandex.ru", "https://mc.yandex.com", "wss://mc.yandex.ru", "wss://mc.yandex.com", "https://yandex.ru", "https://*.maps.2gis.com", "https://maps.api.2gis.ru", "https://catalog.api.2gis.ru", "https://keys.api.2gis.com"],
-            imgSrc: ["'self'", "data:", "https://mc.yandex.ru", "https://mc.yandex.com", "https://*.maps.2gis.com", "https://maps.api.2gis.ru"],
-            frameSrc: (["https://map.2gis.com", "https://mc.yandex.ru", "https://mc.yandex.com", process.env.GOSUSLUGI_ORIGIN] as (string | undefined)[]).filter(Boolean) as string[],
-            styleSrc: ["'self'", "'unsafe-inline'", "https://maps.api.2gis.ru"],
+            // Держать синхронно с CSP в nginx/nginx.conf (там главный — он действует
+            // на страницу, здесь только ответы API). Карта — iframe Яндекс.Конструктора,
+            // поэтому от неё нужен лишь frame-src; 'unsafe-eval' убран вместе с 2ГИС.
+            scriptSrc: ["'self'", "https://mc.yandex.ru", "https://mc.yandex.com"],
+            connectSrc: ["'self'", "https://mc.yandex.ru", "https://mc.yandex.com", "wss://mc.yandex.ru", "wss://mc.yandex.com", "https://yandex.ru"],
+            imgSrc: ["'self'", "data:", "https://mc.yandex.ru", "https://mc.yandex.com"],
+            frameSrc: (["https://yandex.ru", "https://mc.yandex.ru", "https://mc.yandex.com", process.env.GOSUSLUGI_ORIGIN] as (string | undefined)[]).filter(Boolean) as string[],
+            styleSrc: ["'self'", "'unsafe-inline'"],
         },
     },
 }));

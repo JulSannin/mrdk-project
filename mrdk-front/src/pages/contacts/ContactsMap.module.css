@@ -1,10 +1,16 @@
+/* Теперь это сам <iframe> Конструктора, а не контейнер под JS-карту: отсюда
+   display/border. Размеры задаются здесь, а не параметрами в URL, — иначе карта
+   перестанет быть резиновой. */
 .map {
+  display: block;
   width: 100%;
   height: 420px;
+  border: 0;
   border-radius: 10px;
   overflow: hidden;
 }
 
+/* Показывается только когда карта выключена (пустой MAP_EMBED_SRC). */
 .fallback {
   align-self: flex-start;
   display: inline-flex;

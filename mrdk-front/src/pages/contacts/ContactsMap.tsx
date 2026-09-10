@@ -1,55 +1,31 @@
-import { useEffect, useRef } from 'react';
-import { load2gis, getDG, type DGMap } from '../../shared/lib/load2gis';
-import { DGIS_KEY, mapMarkers } from './contactsMapData';
+import { MAP_EMBED_SRC } from './contactsMapData';
 import styles from './ContactsMap.module.css';
 
-const enabled = Boolean(DGIS_KEY) && mapMarkers.length > 0;
-
+// Карта — iframe Яндекс.Конструктора, грузится вместе со страницей.
+//
+// NB: в отличие от Метрики (shared/analytics/consent.ts, подключается только после
+// «Принять») карта согласия на обработку ПД не ждёт — Яндекс узнаёт о посетителе
+// с первого рендера страницы. Решение осознанное. Если понадобится иначе, самый
+// дешёвый вариант — рендерить iframe по клику, а до клика показывать ссылку наружу.
+//
+// loading="lazy" — карта лежит внизу страницы, до неё ещё надо доскроллить.
 export function ContactsMap({ fallbackHref }: { fallbackHref: string }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!enabled || !containerRef.current) return;
-    const container = containerRef.current;
-    let map: DGMap | undefined;
-    let destroyed = false;
-
-    load2gis(DGIS_KEY)
-      .then(() => {
-        if (destroyed) return;
-        const DG = getDG();
-        const coords = mapMarkers.map((m) => m.coordinates);
-        map = DG.map(container, { center: coords[0], zoom: 12 });
-
-        for (const m of mapMarkers) {
-          DG.marker(m.coordinates).addTo(map).bindPopup(m.label);
-        }
-
-        if (coords.length > 1) {
-          map.fitBounds(DG.latLngBounds(coords), { padding: [40, 40] });
-        }
-      })
-      .catch(() => {});
-
-    return () => {
-      destroyed = true;
-      map?.remove();
-    };
-  }, []);
-
-  if (!enabled) {
+  // Пустой MAP_EMBED_SRC = карта выключена; ссылка наружу работает всегда.
+  if (!MAP_EMBED_SRC) {
     return (
       <a className={styles.fallback} href={fallbackHref} target="_blank" rel="noopener noreferrer">
-        <span aria-hidden="true">📍</span> Посмотреть на карте (2ГИС)
+        <span aria-hidden="true">📍</span> Посмотреть на карте (Яндекс.Карты)
       </a>
     );
   }
 
   return (
-    <div
-      ref={containerRef}
+    <iframe
       className={styles.map}
-      aria-label="Карта с расположением учреждения и его филиалов"
+      src={MAP_EMBED_SRC}
+      title="Карта с расположением учреждения и его филиалов"
+      loading="lazy"
+      allowFullScreen
     />
   );
 }
