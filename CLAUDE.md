@@ -10,6 +10,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Отдельного рунбука нет: эксплуатационные решения (порядок сборки и лимиты памяти, своп, выпуск сертификата и HTTPS, CSP, кэш-заголовки, бэкап/восстановление, владелец тома загрузок) объяснены комментариями в самих файлах — [deploy.sh](deploy.sh), [backup.sh](backup.sh), [restore.sh](restore.sh), [nginx/nginx.conf](nginx/nginx.conf), [docker-compose.yml](docker-compose.yml), [mrdk-back/Dockerfile](mrdk-back/Dockerfile), [mrdk-front/Dockerfile](mrdk-front/Dockerfile), [mrdk-back/.env.example](mrdk-back/.env.example). Меняешь такое поведение — правь комментарий рядом, а не заводи новый документ.
 
+Два документа всё же есть, и граница между ними жёсткая: [README.md](README.md) — назначение, стек, локальный запуск, деплой, бэкапы, переменные; [ARCHITECTURE.md](ARCHITECTURE.md) — устройство в рантайме (путь запроса через nginx, схема данных с индексами, карта модулей, сквозные конвейеры загрузки/сессии/меты). В ARCHITECTURE.md лежит **структура**, а не причины: «почему так» по-прежнему живёт только в комментариях у кода. Обновлять его нужно, когда меняется сама структура — новая таблица или индекс, эндпоинт, публичный раздел, слайс FSD, — а не при каждой правке поведения.
+
 ## Команды
 
 ```bash
@@ -54,7 +56,7 @@ npm run test:watch          # watch-режим
 
 **Даты.** `DATE` из Postgres отдаётся строкой `'YYYY-MM-DD'` (парсер типа в [config/db.ts](mrdk-back/src/config/db.ts)). Ни бэк, ни фронт, ни `dataProvider` не гоняют её через `new Date()` — иначе дата уезжает на день из-за таймзоны.
 
-**Новый публичный раздел сайта = три правки:** `STATIC_ROUTES` в [siteMeta.ts](mrdk-front/src/shared/config/siteMeta.ts) (мета + пререндер), `handle` у маршрута в [routes.tsx](mrdk-front/src/app/routes.tsx), `STATIC_PATHS` в [sitemap.ts](mrdk-back/src/controllers/sitemap.ts). `robots.txt` генерируется там же, в `closeBundle`, но `STATIC_ROUTES` не читает: список `Disallow` в нём захардкожен, из siteMeta берётся только `SITE_ORIGIN` для строки `Sitemap:` — закрыть раздел от индексации, «не добавив его в `STATIC_ROUTES`», не получится. Рассинхрон фронта и бэка ловит `sitemap.test.ts` (поэтому backend-CI триггерится и на `siteMeta.ts`).
+**Новый публичный раздел сайта = три правки:** `STATIC_ROUTES` в [siteMeta.ts](mrdk-front/src/shared/config/siteMeta.ts) (мета + пререндер), `handle` у маршрута в [routes.tsx](mrdk-front/src/app/routes.tsx), `STATIC_PATHS` в [sitemap.ts](mrdk-back/src/controllers/sitemap.ts). `robots.txt` генерируется там же, в `closeBundle`, но `STATIC_ROUTES` не читает: список `Disallow` в нём захардкожен, из siteMeta берётся только `SITE_ORIGIN` для строки `Sitemap:` — закрыть раздел от индексации, «не добавив его в `STATIC_ROUTES`», не получится. Рассинхрон фронта и бэка ловит `sitemap.test.ts` (поэтому backend-CI триггерится и на `siteMeta.ts`). Четвёртая правка не обязательная, а бухгалтерская: таблица «маршрут → эндпоинт» в [ARCHITECTURE.md](ARCHITECTURE.md) — на неё ничего не завязано, тест её не стережёт, но без правки она разъедется.
 
 **CSP живёт в двух местах** и должен быть синхронным: `nginx/nginx.conf` (главный — действует на страницу) и helmet в [app.ts](mrdk-back/src/app.ts) (только ответы API). Внешние домены — 2ГИС (нужен `'unsafe-eval'`), Яндекс.Метрика (script/connect с `wss://`/img/frame).
 
