@@ -100,10 +100,22 @@
   gap: 10px;
 }
 
+/* display: block обязателен, а не для красоты. У строчного <a> (а он строчный по
+   умолчанию) width/height молча игнорируются, то есть эти 40px раньше вообще ни на
+   что не влияли. Размер держала внутренняя картинка, а <li> получался 44px: <img>
+   тоже строчный, стоит на базовой линии, и под ним остаётся отбивка под выносные
+   элементы букв. Блочный <a> с явной высотой + блочная картинка убирают и то, и то. */
 .header__socialmedia_link {
+  display: block;
   width: 40px;
   height: 40px;
   transition: transform 0.2s;
+}
+
+.header__socialmedia_link img {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .header__socialmedia_link:hover {

@@ -138,9 +138,19 @@
   gap: 10px;
 }
 
+/* То же, что в Header.module.css и BurgerMenu.module.css: у строчного <a>
+   width/height не работают, а строчный <img> добавляет отбивку под базовую линию —
+   вместе это давало 44px вместо 40. */
 .footer__socialmedia_link {
+  display: block;
   width: 40px;
   height: 40px;
+}
+
+.footer__socialmedia_link img {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .footer__contacts {
