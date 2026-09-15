@@ -25,8 +25,11 @@
   transform: scale(0.55);
 }
 
+/* height задана явно вместе с width (пропорции viewBox логотипа 867.712 × 745.014):
+   иначе место под картинку неизвестно до загрузки SVG (Lighthouse: unsized-images). */
 .header__logo-img {
   width: 180px;
+  height: 155px;
 
   transform-origin: top left;
   transition: transform 0.2s;
@@ -145,6 +148,7 @@
 
   .header__logo-img {
     width: 61px;
+    height: 52px;
     transform: none;
     transition: none;
     will-change: auto;

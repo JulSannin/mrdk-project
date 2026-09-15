@@ -20,7 +20,9 @@ function ExternalLinkCards() {
                 className={styles.image}
                 src={image}
                 alt={title ?? ''}
-                fetchPriority="high"
+                // Блок стоит внизу страниц, обычно ниже первого экрана: высокий приоритет у девяти
+                // логотипов (~520 КБ) отбирал канал у картинок первого экрана.
+                loading="lazy"
                 width={300}
                 height={150}
               />

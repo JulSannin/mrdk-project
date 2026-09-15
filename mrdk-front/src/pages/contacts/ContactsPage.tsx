@@ -81,7 +81,7 @@ export function ContactsPage() {
   const validate = (): { field: string; message: string } | null => {
     if (name.trim().length < 2) return { field: 'name', message: 'Имя: минимум 2 символа' };
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))
-      return { field: 'email', message: 'Некорректный email' };
+      return { field: 'email', message: 'Некорректный адрес электронной почты' };
     if (message.trim().length < 10)
       return { field: 'message', message: 'Сообщение: минимум 10 символов' };
     if (!consent)
@@ -169,7 +169,7 @@ export function ContactsPage() {
             required
           />
           <label htmlFor="cf-email" className="sr-only">
-            Email
+            Электронная почта
           </label>
           <input
             id="cf-email"
@@ -180,7 +180,7 @@ export function ContactsPage() {
               setEmail(e.target.value);
               clearError();
             }}
-            placeholder="Email *"
+            placeholder="Электронная почта *"
             autoComplete="email"
             maxLength={254}
             aria-invalid={errorField === 'email' || undefined}
