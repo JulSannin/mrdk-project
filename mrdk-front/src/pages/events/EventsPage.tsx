@@ -114,8 +114,15 @@ export function EventsPage() {
               ))
             : events.map((event, i) => (
                 <li key={event.id}>
-                  {/* первый ряд грузим приоритетно — ускоряет LCP при заходе на страницу */}
-                  <EventCard event={event} priority={i < 4} paused={isPlaceholderData} />
+                  {/* первый ряд грузим приоритетно — ускоряет LCP при заходе на страницу; остальные
+                      карточки тоже сразу, а не при прокрутке. Смену года/страницы это не
+                      тормозит: недогруженные картинки старой выборки обрываются (paused). */}
+                  <EventCard
+                    event={event}
+                    priority={i < 4}
+                    lazy={false}
+                    paused={isPlaceholderData}
+                  />
                 </li>
               ))}
         </ul>

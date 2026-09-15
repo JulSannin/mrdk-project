@@ -10,15 +10,19 @@ const MAX_DESCRIPTION_LENGTH = 116;
 // priority — для карточек «над сгибом» (первый ряд на главной / первой странице):
 // изображение грузим сразу и с высоким приоритетом, остальные — лениво. Это убирает
 // задержку LCP (первая карточка — обычно самый крупный элемент первого экрана).
+// lazy — остальные карточки грузить при прокрутке (по умолчанию, так на главной).
+// На /events выключено: там все карточки страницы грузятся сразу.
 // paused — список уже запросил другую страницу/год: недогруженная картинка обрывает
 // загрузку, чтобы не занимать канал (подробности — у пропа paused в BviImg).
 function EventCard({
   event,
   priority = false,
+  lazy = true,
   paused,
 }: {
   event: Event;
   priority?: boolean;
+  lazy?: boolean;
   paused?: boolean;
 }) {
   return (
@@ -30,7 +34,7 @@ function EventCard({
             skeleton
             src={event.image_path ? `/${event.image_path}` : '/default.jpg'}
             alt={event.title}
-            loading={priority ? 'eager' : 'lazy'}
+            loading={priority || !lazy ? 'eager' : 'lazy'}
             fetchPriority={priority ? 'high' : undefined}
             paused={paused}
           />
