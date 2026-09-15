@@ -84,7 +84,11 @@ export function RemindersPage() {
               ))
             : reminders.map((reminder) => (
                 <li key={reminder.id}>
-                  <ReminderCard reminder={reminder} onOpen={setSelected} />
+                  <ReminderCard
+                    reminder={reminder}
+                    onOpen={setSelected}
+                    paused={isPlaceholderData}
+                  />
                 </li>
               ))}
         </ul>

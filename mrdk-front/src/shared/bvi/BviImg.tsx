@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import type { ImgHTMLAttributes, CSSProperties } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { ImgHTMLAttributes, CSSProperties, SyntheticEvent } from 'react';
 import { useBvi } from './BviContext';
 import styles from '../ui/ui.module.css';
 
@@ -26,8 +26,18 @@ type BviImgProps = Pick<
    * выключено намеренно: этим же компонентом рисуются иконки соцсетей и логотипы,
    * где мерцающая заглушка выглядит мусором. Включать для контентных изображений
    * (карточки событий и памяток, галерея события) — они тяжёлые и грузятся заметно.
+   * Такие картинки ещё и обрывают свою загрузку при размонтировании (см. эффект ниже).
    */
   skeleton?: boolean;
+  /**
+   * Оборвать загрузку, пока картинка не догрузилась: снимаем src, и браузер отменяет
+   * запрос. Уже загруженная картинка остаётся на месте. Нужен спискам на
+   * keepPreviousData: после клика по году или странице старые карточки ещё на экране,
+   * и их недокачанные картинки делят канал с запросом новой выборки — по замерам
+   * ответ API ждал за ними 1–3 с вместо ~100 мс. Снимается и srcSet: иначе браузер
+   * продолжил бы грузить картинку из него.
+   */
+  paused?: boolean;
 };
 
 // В режиме «изображения выкл» (BVI) вместо картинки показываем блок того же размера
@@ -39,10 +49,16 @@ export function BviImg({
   width,
   height,
   skeleton = false,
+  paused,
   src,
+  srcSet,
   ...rest
 }: BviImgProps) {
   const { enabled, images } = useBvi();
+
+  // Факт загрузки нужен и шиммеру, и отмене: paused не должен снимать src с уже
+  // загруженной картинки, а размонтирование — трогать догруженную.
+  const tracksLoad = skeleton || paused !== undefined;
 
   // Храним ЗАГРУЖЕННЫЙ src, а не булев флаг: при смене src (React переиспользует
   // узел, если ключ прежний) состояние сбрасывается само — без useEffect и без
@@ -50,17 +66,52 @@ export function BviImg({
   const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
   const isLoaded = src != null && loadedSrc === src;
 
+  // Последний смонтированный <img> — для отмены загрузки при размонтировании.
+  // В null намеренно не сбрасываем: React вызывает ref(null) раньше, чем эффект
+  // размонтирования, и тот остался бы без узла.
+  const nodeRef = useRef<HTMLImageElement | null>(null);
+
   const markLoaded = useCallback(() => setLoadedSrc(src ?? null), [src]);
 
-  // Картинка из кэша успевает догрузиться до того, как React навесит onLoad, —
-  // тогда событие не придёт вовсе и шиммер завис бы навсегда. Ref-колбэк ловит
-  // этот случай: complete=true уже в момент монтирования узла.
-  const captureCached = useCallback(
-    (node: HTMLImageElement | null) => {
-      if (node?.complete) setLoadedSrc(src ?? null);
+  // onError тоже снимает шиммер: битая ссылка не должна мерцать вечно — пусть лучше
+  // будет виден штатный «сломанный» вид картинки с alt. Но если src сняли мы сами
+  // (paused), это не ошибка загрузки: иначе картинка сочлась бы «готовой», src
+  // вернулся бы на место и загрузка началась бы заново.
+  const markFailed = useCallback(
+    (e: SyntheticEvent<HTMLImageElement>) => {
+      if (e.currentTarget.hasAttribute('src')) setLoadedSrc(src ?? null);
     },
     [src],
   );
+
+  // Картинка из кэша успевает догрузиться до того, как React навесит onLoad, —
+  // тогда событие не придёт вовсе и шиммер завис бы навсегда. Ref-колбэк ловит
+  // этот случай: complete=true уже в момент монтирования узла. У <img> без src
+  // complete тоже true, поэтому наличие src проверяем явно.
+  const captureNode = useCallback(
+    (node: HTMLImageElement | null) => {
+      if (!node) return;
+      nodeRef.current = node;
+      if (node.complete && node.hasAttribute('src')) setLoadedSrc(src ?? null);
+    },
+    [src],
+  );
+
+  // Удаление <img> из DOM загрузку НЕ отменяет: по замерам картинки ушедшей выборки
+  // докачивались до конца, хотя карточек на странице уже не было. Отменяет её
+  // только снятие src. Эффект размонтирования выполняется после того, как узел
+  // вынут из DOM; проверка isConnected не даёт тронуть картинку, которая осталась
+  // на странице (смена tracksLoad, двойной вызов эффектов в StrictMode).
+  useEffect(() => {
+    if (!tracksLoad) return;
+    return () => {
+      const node = nodeRef.current;
+      if (node && !node.isConnected && !node.complete) {
+        node.removeAttribute('srcset');
+        node.removeAttribute('src');
+      }
+    };
+  }, [tracksLoad]);
 
   if (enabled && images === 'off') {
     const boxStyle: CSSProperties = { ...style };
@@ -73,21 +124,22 @@ export function BviImg({
     );
   }
 
+  const held = paused && !isLoaded;
+
   return (
     <img
       alt={alt}
-      src={src}
+      src={held ? undefined : src}
+      srcSet={held ? undefined : srcSet}
       className={[className, skeleton && !isLoaded ? styles.imgLoading : '']
         .filter(Boolean)
         .join(' ')}
       style={style}
       width={width}
       height={height}
-      ref={skeleton ? captureCached : undefined}
-      // onError тоже снимает шиммер: битая ссылка не должна мерцать вечно —
-      // пусть лучше будет виден штатный «сломанный» вид картинки с alt.
-      onLoad={skeleton ? markLoaded : undefined}
-      onError={skeleton ? markLoaded : undefined}
+      ref={tracksLoad ? captureNode : undefined}
+      onLoad={tracksLoad ? markLoaded : undefined}
+      onError={tracksLoad ? markFailed : undefined}
       {...rest}
     />
   );

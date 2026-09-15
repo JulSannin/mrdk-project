@@ -115,7 +115,7 @@ export function EventsPage() {
             : events.map((event, i) => (
                 <li key={event.id}>
                   {/* первый ряд грузим приоритетно — ускоряет LCP при заходе на страницу */}
-                  <EventCard event={event} priority={i < 4} />
+                  <EventCard event={event} priority={i < 4} paused={isPlaceholderData} />
                 </li>
               ))}
         </ul>

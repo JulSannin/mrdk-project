@@ -10,7 +10,17 @@ const MAX_DESCRIPTION_LENGTH = 116;
 // priority — для карточек «над сгибом» (первый ряд на главной / первой странице):
 // изображение грузим сразу и с высоким приоритетом, остальные — лениво. Это убирает
 // задержку LCP (первая карточка — обычно самый крупный элемент первого экрана).
-function EventCard({ event, priority = false }: { event: Event; priority?: boolean }) {
+// paused — список уже запросил другую страницу/год: недогруженная картинка обрывает
+// загрузку, чтобы не занимать канал (подробности — у пропа paused в BviImg).
+function EventCard({
+  event,
+  priority = false,
+  paused,
+}: {
+  event: Event;
+  priority?: boolean;
+  paused?: boolean;
+}) {
   return (
     <Link to={`/events/${event.id}`} className={styles['event-card-link']} viewTransition>
       <article id={`event-${event.id}`} className={styles['event-card']}>
@@ -22,6 +32,7 @@ function EventCard({ event, priority = false }: { event: Event; priority?: boole
             alt={event.title}
             loading={priority ? 'eager' : 'lazy'}
             fetchPriority={priority ? 'high' : undefined}
+            paused={paused}
           />
         </div>
         {event.event_date ? (
