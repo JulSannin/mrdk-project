@@ -80,8 +80,8 @@ export function HomePage() {
                 ))
               : data.data.slice(0, visible).map((event, i) => (
                   <li key={event.id}>
-                    {/* первый ряд (до 4 колонок) грузим приоритетно — это ускоряет LCP */}
-                    <EventCard event={event} priority={i < 4} />
+                    {/* первую карточку грузим приоритетно — это ускоряет LCP */}
+                    <EventCard event={event} load={i === 0 ? 'priority' : 'lazy'} />
                   </li>
                 ))}
           </ul>

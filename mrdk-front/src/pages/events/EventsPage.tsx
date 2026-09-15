@@ -25,7 +25,7 @@ export function EventsPage() {
   const year = yearParam && /^\d{4}$/.test(yearParam) ? yearParam : null;
 
   // список годов меняется редко -> держим кэш свежим долго, без повторных запросов при пагинации
-  const { data: yearsData } = useQuery({
+  const { data: yearsData, isPending: yearsPending } = useQuery({
     queryKey: ['events', 'years'],
     queryFn: () => apiClient.get<ApiList<EventYear>>('/events/years').then((r) => r.data.data),
     staleTime: 1000 * 60 * 60,
@@ -79,7 +79,9 @@ export function EventsPage() {
       <section className={styles.section}>
         <h1 className={styles.title}>События</h1>
 
-        {years.length > 0 && (
+        {/* пока список годов грузится, фильтр уже стоит (неактивный): иначе он появился бы
+            над отрисованной сеткой и сдвинул её вниз. Прячем, только если годов нет вовсе */}
+        {(yearsPending || years.length > 0) && (
           <div className={styles.filter}>
             <label htmlFor="year-select" className={styles['filter-label']}>
               Год:
@@ -88,9 +90,15 @@ export function EventsPage() {
               id="year-select"
               className={styles['year-select']}
               value={year ?? ''}
+              disabled={yearsPending}
               onChange={(e) => onYearChange(e.target.value)}
             >
               <option value="">Все года</option>
+              {/* год из URL, которого нет в списке (или список ещё не пришёл): без этой опции
+                  select молча показал бы «Все года», хотя сетка отфильтрована */}
+              {year && !years.some((y) => String(y.year) === year) && (
+                <option value={year}>{year}</option>
+              )}
               {years.map((y) => (
                 <option key={y.year} value={y.year}>
                   {y.year} ({y.count})
@@ -114,13 +122,14 @@ export function EventsPage() {
               ))
             : events.map((event, i) => (
                 <li key={event.id}>
-                  {/* первый ряд грузим приоритетно — ускоряет LCP при заходе на страницу; остальные
-                      карточки тоже сразу, а не при прокрутке. Смену года/страницы это не
-                      тормозит: недогруженные картинки старой выборки обрываются (paused). */}
+                  {/* все карточки страницы грузятся сразу, не дожидаясь прокрутки; приоритет —
+                      только первой, это LCP. При смене года/страницы недогруженные картинки
+                      старой выборки обрываются: пока новая не пришла — через paused, а если
+                      она уже в кэше и старые карточки сразу размонтируются — эффектом
+                      размонтирования в BviImg */}
                   <EventCard
                     event={event}
-                    priority={i < 4}
-                    lazy={false}
+                    load={i === 0 ? 'priority' : 'eager'}
                     paused={isPlaceholderData}
                   />
                 </li>

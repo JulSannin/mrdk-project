@@ -97,11 +97,15 @@ export function BviImg({
     [src],
   );
 
+  const imagesOff = enabled && images === 'off';
+
   // Удаление <img> из DOM загрузку НЕ отменяет: по замерам картинки ушедшей выборки
   // докачивались до конца, хотя карточек на странице уже не было. Отменяет её
-  // только снятие src. Эффект размонтирования выполняется после того, как узел
-  // вынут из DOM; проверка isConnected не даёт тронуть картинку, которая осталась
-  // на странице (смена tracksLoad, двойной вызов эффектов в StrictMode).
+  // только снятие src. Очистка эффекта выполняется после того, как узел вынут из DOM;
+  // проверка isConnected не даёт тронуть картинку, которая осталась на странице
+  // (смена tracksLoad, двойной вызов эффектов в StrictMode). imagesOff в зависимостях —
+  // потому что включение «изображения выкл» заменяет <img> на <span> без
+  // размонтирования компонента, и без него скрытые картинки докачивались бы.
   useEffect(() => {
     if (!tracksLoad) return;
     return () => {
@@ -111,9 +115,9 @@ export function BviImg({
         node.removeAttribute('src');
       }
     };
-  }, [tracksLoad]);
+  }, [tracksLoad, imagesOff]);
 
-  if (enabled && images === 'off') {
+  if (imagesOff) {
     const boxStyle: CSSProperties = { ...style };
     if (width != null) boxStyle.width = typeof width === 'number' ? `${width}px` : width;
     if (height != null) boxStyle.height = typeof height === 'number' ? `${height}px` : height;
